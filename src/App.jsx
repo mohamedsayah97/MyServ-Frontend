@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Navbar from './pages/Navbar'
 import Suivientre from './pages/suivientre'
 import Suivirec from './pages/suivirec'
+import Signup from './pages/Signup'
 
 function App() {
  
@@ -19,6 +20,7 @@ function App() {
       <Route path='/suivientretien' element={<Suivientre/>}/> 
       <Route path='/suivirecruteur' element={<Suivirec/>}/> 
       <Route path='/ajoutcandidat' element={<Ajoutcand/>}/> 
+      <Route path='/signup' element={<Signup/>}/> 
       </Routes>
     </>
   )
