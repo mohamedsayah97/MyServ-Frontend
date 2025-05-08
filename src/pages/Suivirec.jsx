@@ -1,9 +1,14 @@
 import React from 'react'
 
+
 const Suivirec = () => {
-  return (
+  return ( 
+ 
     <div>Suivirec</div>
+  
+    
+    
   )
 }
 
-export default Suivirec
+export default Suivirec;
