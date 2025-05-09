@@ -9,19 +9,32 @@ const Sidebar = () => {
         <br />
         <br />
         <br />
+        <br />
+        <br />
+        <br />
         <ul>
           <li>
             <Link to="/dashboard/addrh">*Ajouter RH</Link>
           </li>
+          <br />
+       
           <li>
-            <Link to="/dashboard/suivirecruteur">*Suivi Entretien</Link>
+            <Link to="/dashboard/suivientretien">*Suivi Entretien</Link>
           </li>
+          <br />
+      
           <li>
             <Link to="/dashboard/suivirecruteur">*Suivi Recruteur</Link>
           </li>
+          <br />
+       
           <li>
             <Link to="/dashboard/ajoutcandidat">*Ajouter Candidat</Link>
+            
           </li>
+          
+          <br />
+      
           <li>
             <Link to="/dashboard">*Dashboard</Link>
           </li>

@@ -27,6 +27,10 @@ const LoginPage = () => {
   };
 
   return (
+    <div>
+    <div className="flex justify-between items-center bg-white shadow-md p-4 h-20">
+      <h1 className="text-blue-600/100 dark:text-sky-400/100">GO Recrutement</h1>
+      </div>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-md p-8">
@@ -88,6 +92,7 @@ const LoginPage = () => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };

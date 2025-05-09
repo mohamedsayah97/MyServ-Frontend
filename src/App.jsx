@@ -5,8 +5,7 @@ import Ajoutcand from "./pages/ajoutcand";
 import Login from "./pages/Login";
 import Navbar from "./pages/Navbar";
 import Suivientre from "./pages/suivientre";
-import Suivirec from "./pages/suivirec";
-
+import Suivirec from "./pages/Suivirec";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./pages/Layout";
 
