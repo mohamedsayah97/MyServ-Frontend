@@ -1,32 +1,58 @@
 import React, { useState } from 'react'
 
 const Addrh = () => {
+  const [nom, setNom] = useState('');
+  const [prenom, setPrenom] = useState('');
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
-  const [addedUser, setAddedUser] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteMessage, setDeleteMessage] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleNomChange = (e) => {
+    setNom(e.target.value);
+  }
+
+  const handlePrenomChange = (e) => {
+    setPrenom(e.target.value);
+  }
 
   const handleEmailChange = (e) => {
     setMail(e.target.value);
+    setErrorMessage(''); // Efface le message d'erreur quand l'utilisateur modifie l'email
   }
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   }
 
+  const isEmailExists = (email, currentUserId = null) => {
+    return users.some(user => user.mail === email && user.id !== currentUserId);
+  }
+
   const handleAddUser = () => {
-    if (mail && password) {
+    if (nom && prenom && mail && password) {
+      if (isEmailExists(mail)) {
+        setErrorMessage('Cet email existe déjà !');
+        setTimeout(() => {
+          setErrorMessage('');
+        }, 3000);
+        return;
+      }
+
       const newUser = { 
         id: Date.now(),
+        nom,
+        prenom,
         mail, 
         password: password.replace(/./g, '•')
       };
       setUsers([...users, newUser]);
-      setAddedUser(newUser);
+      setNom('');
+      setPrenom('');
       setMail('');
       setPassword('');
       
@@ -48,16 +74,28 @@ const Addrh = () => {
 
   const handleStartEditing = (user) => {
     setEditingUserId(user.id);
+    setNom(user.nom);
+    setPrenom(user.prenom);
     setMail(user.mail);
-    setPassword(''); // On vide le mot de passe pour la modification
+    setPassword('');
   }
 
   const handleUpdateUser = () => {
-    if (mail && editingUserId) {
+    if (nom && prenom && mail && editingUserId) {
+      if (isEmailExists(mail, editingUserId)) {
+        setErrorMessage('Cet email existe déjà !');
+        setTimeout(() => {
+          setErrorMessage('');
+        }, 3000);
+        return;
+      }
+
       const updatedUsers = users.map(user => {
         if (user.id === editingUserId) {
           return { 
             ...user, 
+            nom,
+            prenom,
             mail,
             password: password ? password.replace(/./g, '•') : user.password
           };
@@ -67,6 +105,8 @@ const Addrh = () => {
       
       setUsers(updatedUsers);
       setEditingUserId(null);
+      setNom('');
+      setPrenom('');
       setMail('');
       setPassword('');
       
@@ -79,12 +119,16 @@ const Addrh = () => {
 
   const handleCancelEditing = () => {
     setEditingUserId(null);
+    setNom('');
+    setPrenom('');
     setMail('');
     setPassword('');
+    setErrorMessage('');
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setErrorMessage(''); // Efface les erreurs précédentes
     if (editingUserId) {
       handleUpdateUser();
     } else {
@@ -95,6 +139,26 @@ const Addrh = () => {
   return (
     <div className="p-4">
       <form onSubmit={handleSubmit}>
+        <input 
+          type='text' 
+          placeholder='Nom' 
+          className='border border-gray-300 rounded-md p-2' 
+          value={nom}
+          onChange={handleNomChange}
+          required
+        />
+        <br />
+        <br />
+        <input 
+          type='text' 
+          placeholder='Prénom' 
+          className='border border-gray-300 rounded-md p-2' 
+          value={prenom}
+          onChange={handlePrenomChange}
+          required
+        />
+        <br />
+        <br />
         <input 
           type='email' 
           placeholder='email' 
@@ -133,7 +197,14 @@ const Addrh = () => {
         )}
       </form>
 
-      {/* Messages de statut */}
+      {/* Messages d'erreur */}
+      {errorMessage && (
+        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Messages de succès */}
       {successMessage && (
         <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md">
           {successMessage}
@@ -150,14 +221,6 @@ const Addrh = () => {
         </div>
       )}
 
-      {addedUser && !editingUserId && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-md">
-          <h3 className="font-bold">Dernier utilisateur ajouté :</h3>
-          <p>Email: {addedUser.mail}</p>
-          <p>Mot de passe: {addedUser.password}</p>
-        </div>
-      )}
-
       {users.length > 0 && (
         <div className="mt-4">
           <h3 className="font-bold">Liste des utilisateurs :</h3>
@@ -166,6 +229,8 @@ const Addrh = () => {
               <li key={user.id} className="mt-2 p-3 bg-gray-100 rounded-md">
                 <div className="flex justify-between items-center">
                   <div>
+                    <p>Nom: {user.nom}</p>
+                    <p>Prénom: {user.prenom}</p>
                     <p>Email: {user.mail}</p>
                     <p>Mot de passe: {user.password}</p>
                   </div>
