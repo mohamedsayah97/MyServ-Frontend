@@ -146,7 +146,7 @@ const Ajoutcand = () => {
           <ul className="space-y-4">
             {candidates.map((candidate) => (
               <li key={candidate.id} className="p-4 border rounded-md">
-                <p><strong>Nom :</strong> {candidate.name} {candidate.lastname}</p>
+                <p><strong>Nom et prénom :</strong> {candidate.name} {candidate.lastname}</p>
                 <p><strong>Date :</strong> {candidate.date} à {candidate.time}</p>
                 <p><strong>Poste :</strong> {candidate.poste}</p>
                 <p><strong>CV :</strong> {candidate.cvName}</p>

@@ -4,7 +4,7 @@ import Addrh from "./pages/Addrh";
 import Ajoutcand from "./pages/ajoutcand";
 import Login from "./pages/Login";
 import Navbar from "./pages/Navbar";
-import Suivientre from "./pages/suivientre";
+import Suivientre from "./pages/Suivientre";
 import Suivirec from "./pages/Suivirec";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./pages/Layout";
