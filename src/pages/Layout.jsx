@@ -2,8 +2,37 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import { instance } from "../../config/axios";
 
 const Layout = () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    window.location.href = "/login";
+  }
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      try {
+        const res = await instance.get("/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(res.data.data.role);
+        localStorage.setItem("user", JSON.stringify(res.data.data));
+        if (res.data.data.role !== "RH") {
+          localStorage.clear();
+          window.location.href = "/login";
+        }
+      } catch (error) {
+        localStorage.clear();
+        window.location.href = "/login";
+        console.error("Error fetching user data:", error);
+      }
+    };
+    getUser();
+  }, [token]);
+
   return (
     <div className="h-screen flex flex-col">
       <Navbar />
