@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { instance } from '../../config/axios';
+// import { useNavigate } from 'react-router-dom';
+
 
 const Addrh = () => {
   const [nom, setNom] = useState('');
@@ -11,7 +14,7 @@ const Addrh = () => {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+  // const navigate = useNavigate();
   const handleNomChange = (e) => {
     setNom(e.target.value);
   }
@@ -126,14 +129,30 @@ const Addrh = () => {
     setErrorMessage('');
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(''); // Efface les erreurs précédentes
-    if (editingUserId) {
-      handleUpdateUser();
-    } else {
-      handleAddUser();
+    try {
+      const res = await instance.post('/users/create', { 
+        nom,
+        prenom,
+        mail,
+        password},{
+      withCredentials: true
+    });
+         localStorage.setItem('createToken', res.data.createToken);
+
+      window.location.href='/dashboard/addrh';
+      //  navigate('/dashboard/addrh');
+    } catch (error) {
+      console.log(error);
+      
     }
+    // setErrorMessage(''); // Efface les erreurs précédentes
+    // if (editingUserId) {
+    //   handleUpdateUser();
+    // } else {
+    //   handleAddUser();
+    // }
   }
 
   return (

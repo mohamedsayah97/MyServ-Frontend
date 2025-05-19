@@ -20,7 +20,7 @@ const Layout = () => {
         });
         console.log(res.data.data.role);
         localStorage.setItem("user", JSON.stringify(res.data.data));
-        if (res.data.data.role !== "RH") {
+        if (res.data.data.role !== "RH" && res.data.data.role !== "ADMIN") {
           localStorage.clear();
           window.location.href = "/login";
         }
