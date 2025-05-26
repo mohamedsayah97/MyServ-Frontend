@@ -237,13 +237,13 @@ const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const techOptions = [
-    { value: "admin_db", label: "Administrateur de base de données", icon: <FiDatabase className="text-rose-500" /> },
-    { value: "analyste_cyber", label: "Analyste CyberSécurité", icon: <FiShield className="text-rose-500" /> },
-    { value: "consultant_sap", label: "Consultant SAP", icon: <FiBox className="text-rose-500" /> },
-    { value: "dev_fullstack", label: "Développeur Full Stack", icon: <FiCode className="text-rose-500" /> },
-    { value: "ingenieur_ia", label: "Ingénieur en Intelligence Artificielle", icon: <FiCpu className="text-rose-500" /> },
-    { value: "ingenieur_reseau", label: "Ingénieur Réseau & Sécurité", icon: <FiGlobe className="text-rose-500" /> },
-    { value: "ingenieur_cloud", label: "Ingénieur Système & Cloud", icon: <FiCloud className="text-rose-500" /> }
+    { value: "admindb", label: "Administrateur de base de données", icon: <FiDatabase className="text-rose-500" /> },
+    { value: "analyste_cyber_securite", label: "Analyste CyberSécurité", icon: <FiShield className="text-rose-500" /> },
+    { value: "erp", label: "Consultant SAP", icon: <FiBox className="text-rose-500" /> },
+    { value: "full_stack", label: "Développeur Full Stack", icon: <FiCode className="text-rose-500" /> },
+    { value: "inteligence_artificiel", label: "Ingénieur en Intelligence Artificielle", icon: <FiCpu className="text-rose-500" /> },
+    { value: "reseau", label: "Ingénieur Réseau & Sécurité", icon: <FiGlobe className="text-rose-500" /> },
+    { value: "cloud", label: "Ingénieur Système & Cloud", icon: <FiCloud className="text-rose-500" /> }
   ];
 
   const handleNavigation = (path) => {
