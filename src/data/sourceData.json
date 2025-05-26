@@ -1,0 +1,30 @@
+[
+    {
+        "label": "Administrateur DB",
+        "value": 10
+    },
+    {
+        "label": "Analyste CyberSécurité",
+        "value": 20
+    },
+    {
+        "label": "Consultant SAP",
+        "value": 30
+    },
+    {
+        "label": "Développeur Full-Stack",
+        "value": 40
+    },
+    {
+        "label": "Ingénieur IA",
+        "value": 10
+    },
+    {
+        "label": "Ingénieur Réseau",
+        "value": 25
+    },
+    {
+        "label": "Ingénieur Cloud",
+        "value": 30
+    }
+]

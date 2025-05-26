@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Dashboard = () => {
+const Suivientre = () => {
   const [tables, setTables] = useState([
     {
       id: 1,
@@ -93,7 +93,7 @@ const Dashboard = () => {
         date: `${date} ${time}`,
         feedback,
         comment,
-        recruiter,
+        recruiter,	
         status: feedback.includes("Non validé") ? "rejected" : 
                feedback === "En cours" ? "in-progress" : 
                feedback === "Recruté" ? "hired" : "pending"
@@ -356,4 +356,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Suivientre;

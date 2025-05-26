@@ -1,0 +1,28 @@
+[
+    {
+        "label": "jan",
+        "nb": 10
+        
+    },
+     {
+        "label": "feb",
+        "nb": 6
+    },
+     {
+        "label": "mars",
+        "nb": 2
+    },
+     {
+        "label": "april",
+        "nb": 30
+    },
+     {
+        "label": "mais",
+        "nb": 22
+    },
+     {
+        "label": "juin",
+        "nb": 24
+    }
+
+]

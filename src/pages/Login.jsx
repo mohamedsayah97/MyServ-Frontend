@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { instance } from "../../config/axios";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [mail, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await instance.post("/users/login", { email, password });
+      const res = await instance.post("/users/login", { mail, password });
 
       localStorage.setItem('accessToken', res.data.accessToken);
 
@@ -83,7 +83,7 @@ const LoginPage = () => {
                 <input
                   type="email"
                   id="email"
-                  value={email}
+                  value={mail}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="votre@email.com"
