@@ -15,6 +15,9 @@ import Fullstack from "./pages/Fullstack";
 import Ia from "./pages/Ia";
 import Reseau from "./pages/Reseau";
 import Cloud from "./pages/Cloud";
+import CreateCan from "./pages/CreateCan";
+import EditCan from "./pages/EditCan";
+import ViewCan from "./pages/ViewCan";
 
 
 function App() {
@@ -35,6 +38,9 @@ function App() {
           <Route path="inteligence_artificiel" element={<Ia />} />
           <Route path="reseau" element={<Reseau />} />
           <Route path="cloud" element={<Cloud />} />
+          <Route path="create_candidat" element={<CreateCan />} />
+          <Route path="edit_candidat/:id" element={<EditCan />} />
+          <Route path="view_candidat/:id" element={<ViewCan />} />
         </Route>
       </Routes>
     </>

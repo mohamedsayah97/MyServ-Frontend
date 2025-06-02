@@ -18,7 +18,7 @@ const Navbar = () => {
       </div>
 
       {/* Barre de recherche */}
-      <div className="flex-1 max-w-md mx-4 hidden md:block">
+      {/* <div className="flex-1 max-w-md mx-4 hidden md:block">
         <div className="relative">
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-rose-300" />
           <input
@@ -27,7 +27,7 @@ const Navbar = () => {
             className="w-full pl-10 pr-4 py-2 rounded-xl bg-rose-50 border border-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-transparent text-rose-700 placeholder-rose-300"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Icônes de navigation */}
       <div className="flex items-center space-x-4">
