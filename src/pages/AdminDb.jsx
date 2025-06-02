@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes } from 'react-icons/fa';
@@ -486,9 +484,12 @@ const AdminDb = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <Link 
+                          to="/tessssst" 
+                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
                           <FaEllipsisH size={16} />
-                        </button>
+                        </Link>
                       </td>
                     </>
                   ) : (
@@ -538,9 +539,12 @@ const AdminDb = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <Link 
+                          to="/tessssst" 
+                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
                           <FaEllipsisH size={16} />
-                        </button>
+                        </Link>
                       </td>
                     </>
                   )}
