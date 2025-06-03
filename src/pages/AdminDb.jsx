@@ -13,7 +13,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "Jane Smith",
-      lienCompteRendu: "http://example.com/compte-rendu-1"
+      lienCompteRendu: "http://example.com/compte-rendu-1",
+      cvUrl: "http://example.com/cv-1.pdf"
     },
     {
       id: 2,
@@ -24,7 +25,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "test test",
-      lienCompteRendu: "http://example.com/compte-rendu-2"
+      lienCompteRendu: "http://example.com/compte-rendu-2",
+      cvUrl: "http://example.com/cv-2.pdf"
     },
     {
       id: 3,
@@ -35,7 +37,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "test test",
-      lienCompteRendu: "http://example.com/compte-rendu-3"
+      lienCompteRendu: "http://example.com/compte-rendu-3",
+      cvUrl: "http://example.com/cv-3.pdf"
     }
   ]);
 
@@ -57,12 +60,14 @@ const AdminDb = () => {
     feedback: "Choix feedback",
     commentaireRh: "",
     Recruteur: "",
-    lienCompteRendu: ""
+    lienCompteRendu: "",
+    cvUrl: ""
   });
 
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [cvFile, setCvFile] = useState(null);
   
   const [newCandidate, setNewCandidate] = useState({
     nom: "",
@@ -72,7 +77,8 @@ const AdminDb = () => {
     feedback: "Choix feedback",
     commentaireRh: "",
     Recruteur: "",
-    lienCompteRendu: ""
+    lienCompteRendu: "",
+    cvUrl: ""
   });
 
   useEffect(() => {
@@ -97,7 +103,8 @@ const AdminDb = () => {
       feedback: candidate.feedback,
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
-      lienCompteRendu: candidate.lienCompteRendu
+      lienCompteRendu: candidate.lienCompteRendu,
+      cvUrl: candidate.cvUrl
     });
   };
 
@@ -146,10 +153,16 @@ const AdminDb = () => {
   const handleAddCandidate = (e) => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
+    
+    // Simuler l'upload du CV (dans une vraie application, vous utiliseriez une API)
+    const fakeCvUrl = `http://example.com/cv-${newId}.pdf`;
+    
     const candidateToAdd = {
       id: newId,
-      ...newCandidate
+      ...newCandidate,
+      cvUrl: fakeCvUrl
     };
+    
     setCandidates([...candidates, candidateToAdd]);
     setNewCandidate({
       nom: "",
@@ -159,8 +172,10 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "",
       Recruteur: "",
-      lienCompteRendu: ""
+      lienCompteRendu: "",
+      cvUrl: ""
     });
+    setCvFile(null);
     setShowAddForm(false);
   };
 
@@ -215,6 +230,18 @@ const AdminDb = () => {
                 <div className="mb-4 md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
                   <div className="p-2 bg-gray-100 rounded min-h-[80px]">{selectedCandidate.commentaireRh}</div>
+                </div>
+                <div className="mb-4 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CV du candidat</label>
+                  <a 
+                    href={selectedCandidate.cvUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
+                  >
+                    <FaFileAlt className="text-blue-500" /> 
+                    <span className="truncate">Télécharger le CV</span>
+                  </a>
                 </div>
                 <div className="mb-4 md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu</label>
@@ -337,6 +364,17 @@ const AdminDb = () => {
                 />
               </div>
               <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">CV du candidat (PDF, DOC, DOCX)*</label>
+                <input
+                  type="file"
+                  name="cv"
+                  onChange={(e) => setCvFile(e.target.files[0])}
+                  className="w-full border rounded px-3 py-2"
+                  accept=".pdf,.doc,.docx"
+                  required
+                />
+              </div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
                 <textarea
                   name="commentaireRh"
@@ -379,6 +417,7 @@ const AdminDb = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire RH</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recruteur</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CV</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compte Rendu</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plus</th>
@@ -458,6 +497,23 @@ const AdminDb = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
+                          type="file"
+                          name="cv"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setEditFormData({
+                                ...editFormData,
+                                cvUrl: URL.createObjectURL(file)
+                              });
+                            }
+                          }}
+                          className="border rounded px-2 py-1 w-full"
+                          accept=".pdf,.doc,.docx"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input
                           type="text"
                           name="lienCompteRendu"
                           value={editFormData.lienCompteRendu}
@@ -502,6 +558,17 @@ const AdminDb = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedback}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.commentaireRh}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.Recruteur}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <a 
+                          href={item.cvUrl} 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          <FaFileAlt className="text-blue-500" /> 
+                          <span className="truncate max-w-xs inline-block">CV</span>
+                        </a>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <a 
                           href={item.lienCompteRendu} 
