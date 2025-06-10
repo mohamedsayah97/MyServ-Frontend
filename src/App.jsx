@@ -18,6 +18,13 @@ import Cloud from "./pages/Cloud";
 import CreateCan from "./pages/CreateCan";
 import EditCan from "./pages/EditCan";
 import ViewCan from "./pages/ViewCan";
+import CompteDbAdmin from "./pages/CompteDbAdmin";
+import CompteReseau from "./pages/CompteReseau";
+import CompteErp from "./pages/CompteErp";
+import CompteFull from "./pages/CompteFull";
+import CompteIa from "./pages/CompteIa";
+import CompteCS from "./pages/CompteCS";
+import CompteCloud from "./pages/CompteCloud";
 
 
 function App() {
@@ -38,9 +45,15 @@ function App() {
           <Route path="inteligence_artificiel" element={<Ia />} />
           <Route path="reseau" element={<Reseau />} />
           <Route path="cloud" element={<Cloud />} />
-          <Route path="create_candidat" element={<CreateCan />} />
-          <Route path="edit_candidat/:id" element={<EditCan />} />
-          <Route path="view_candidat/:id" element={<ViewCan />} />
+          <Route path="compte_rendu_admin_db" element={<CompteDbAdmin />} />
+          <Route path="compte_rendu_reseau" element={<CompteReseau />} />
+          <Route path="compte_rendu_erp" element={<CompteErp />} />
+          <Route path="compte_rendu_full_stack" element={<CompteFull />} />
+          <Route path="compte_rendu_ia" element={<CompteIa />} />
+          <Route path="compte_rendu_analyste_cs" element={<CompteCS />} />
+          <Route path="compte_rendu_cloud" element={<CompteCloud />} />
+          {/* <Route path="edit_candidat/:id" element={<EditCan />} />
+          <Route path="view_candidat/:id" element={<ViewCan />} /> */}
         </Route>
       </Routes>
     </>

@@ -541,7 +541,7 @@ const AdminDb = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link 
-                          to="/tessssst" 
+                          to="dashboard/compte_rendu_admin_db" 
                           className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                         >
                           <FaEllipsisH size={16} />
@@ -607,7 +607,7 @@ const AdminDb = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link 
-                          to="/tessssst" 
+                          to="/dashboard/compte_rendu_admin_db" 
                           className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                         >
                           <FaEllipsisH size={16} />
