@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaDownload, FaUpload, FaSearch } from 'react-icons/fa';
 
 const AnalysteCS = () => {
   const [candidates, setCandidates] = useState([
@@ -15,6 +15,30 @@ const AnalysteCS = () => {
       Recruteur: "Recruteur 1",
       lienCV: "/cv/1",
       lienCompteRendu: "https://www.compte_rendu.com/1"
+    },
+    {
+      id: 2,
+      nom: "Martin",
+      prenom: "Sophie",
+      dateEntretien: "2023-10-05",
+      heureEntretien: "14:30",
+      feedback: "Validé RH",
+      commentaireRh: "Profil intéressant",
+      Recruteur: "Recruteur 2",
+      lienCV: "/cv/2",
+      lienCompteRendu: "https://www.compte_rendu.com/2"
+    },
+    {
+      id: 3,
+      nom: "Bernard",
+      prenom: "Luc",
+      dateEntretien: "2023-10-10",
+      heureEntretien: "09:15",
+      feedback: "Non validé technique",
+      commentaireRh: "Compétences insuffisantes",
+      Recruteur: "Recruteur 1",
+      lienCV: "/cv/3",
+      lienCompteRendu: "https://www.compte_rendu.com/3"
     }
   ]);
 
@@ -43,6 +67,7 @@ const AnalysteCS = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   
   const [newCandidate, setNewCandidate] = useState({
     nom: "",
@@ -58,6 +83,17 @@ const AnalysteCS = () => {
   });
 
   const [fileName, setFileName] = useState("");
+
+  // Fonction de filtrage des candidats
+  const filteredCandidates = candidates.filter(candidate => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      candidate.nom.toLowerCase().includes(searchLower) ||
+      candidate.prenom.toLowerCase().includes(searchLower) ||
+      candidate.feedback.toLowerCase().includes(searchLower) ||
+      candidate.Recruteur.toLowerCase().includes(searchLower)
+    );
+  });
 
   const handleDelete = (id) => {
     const updatedCandidates = candidates.filter(candidate => candidate.id !== id);
@@ -128,7 +164,7 @@ const AnalysteCS = () => {
       setNewCandidate({
         ...newCandidate,
         cvFile: file,
-        lienCV: URL.createObjectURL(file) // Crée un lien temporaire pour prévisualisation
+        lienCV: URL.createObjectURL(file)
       });
     }
   };
@@ -137,8 +173,6 @@ const AnalysteCS = () => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
     
-    // Ici vous devrez implémenter la logique pour uploader le fichier vers votre serveur
-    // Pour l'exemple, nous utilisons juste le nom du fichier
     const candidateToAdd = {
       id: newId,
       ...newCandidate,
@@ -254,12 +288,28 @@ const AnalysteCS = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Analyste CyberSécurité</h2>
-        <button
-          onClick={toggleAddForm}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
-        >
-          <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
-        </button>
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          {/* Barre de recherche */}
+          <div className="relative w-full md:w-64">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaSearch className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher candidat..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <button
+            onClick={toggleAddForm}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
+          >
+            <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
+          </button>
+        </div>
       </div>
 
       {/* Formulaire d'ajout */}
@@ -421,190 +471,198 @@ const AnalysteCS = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {candidates && candidates.map((item) => (
-                <tr className="hover:bg-gray-50 transition-colors duration-150" key={item.id}>
-                  {editingId === item.id ? (
-                    <>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="nom"
-                          value={editFormData.nom}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="prenom"
-                          value={editFormData.prenom}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="date"
-                          name="dateEntretien"
-                          value={editFormData.dateEntretien}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="time"
-                          name="heureEntretien"
-                          value={editFormData.heureEntretien}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          name="feedback"
-                          value={editFormData.feedback}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          {feedbackOptions.map((option, index) => (
-                            <option key={index} value={option}>{option}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <textarea
-                          name="commentaireRh"
-                          value={editFormData.commentaireRh}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                          rows="2"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="Recruteur"
-                          value={editFormData.Recruteur}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="file"
-                          name="lienCV"
-                          onChange={handleFileChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="lienCompteRendu"
-                          value={editFormData.lienCompteRendu}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={handleEditFormSubmit}
-                            className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
-                            title="Enregistrer"
+              {filteredCandidates.length > 0 ? (
+                filteredCandidates.map((item) => (
+                  <tr className="hover:bg-gray-50 transition-colors duration-150" key={item.id}>
+                    {editingId === item.id ? (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="nom"
+                            value={editFormData.nom}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="prenom"
+                            value={editFormData.prenom}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="date"
+                            name="dateEntretien"
+                            value={editFormData.dateEntretien}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="time"
+                            name="heureEntretien"
+                            value={editFormData.heureEntretien}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <select
+                            name="feedback"
+                            value={editFormData.feedback}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
                           >
-                            ✓
-                          </button>
-                          <button
-                            onClick={handleCancelClick}
-                            className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
-                            title="Annuler"
+                            {feedbackOptions.map((option, index) => (
+                              <option key={index} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <textarea
+                            name="commentaireRh"
+                            value={editFormData.commentaireRh}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                            rows="2"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="Recruteur"
+                            value={editFormData.Recruteur}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="file"
+                            name="lienCV"
+                            onChange={handleFileChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="lienCompteRendu"
+                            value={editFormData.lienCompteRendu}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={handleEditFormSubmit}
+                              className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
+                              title="Enregistrer"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={handleCancelClick}
+                              className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
+                              title="Annuler"
+                            >
+                              ✗
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Link 
+                            to="/dashboard/compte_rendu_analyste_cs" 
+                            className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                           >
-                            ✗
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link 
-                          to="/dashboard/compte_rendu_analyste_cs" 
-                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        >
-                          <FaEllipsisH size={16} />
-                        </Link>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{item.nom}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.prenom}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dateEntretien}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.heureEntretien}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedback}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.commentaireRh}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.Recruteur}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <a 
-                          href={item.lienCV} 
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          <FaDownload className="text-blue-500" /> 
-                          <span>Télécharger</span>
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <a 
-                          href={item.lienCompteRendu} 
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          <FaFileAlt className="text-blue-500" /> 
-                          <span>Voir</span>
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => handleViewClick(item)}
-                            className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-100 transition-colors"
-                            title="Voir détails"
+                            <FaEllipsisH size={16} />
+                          </Link>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{item.nom}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.prenom}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dateEntretien}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.heureEntretien}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedback}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.commentaireRh}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.Recruteur}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a 
+                            href={item.lienCV} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                           >
-                            <FaEye size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
-                            title="Modifier"
+                            <FaDownload className="text-blue-500" /> 
+                            <span>Télécharger</span>
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a 
+                            href={item.lienCompteRendu} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                           >
-                            <FaEdit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
-                            title="Supprimer"
+                            <FaFileAlt className="text-blue-500" /> 
+                            <span>Voir</span>
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleViewClick(item)}
+                              className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-100 transition-colors"
+                              title="Voir détails"
+                            >
+                              <FaEye size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
+                              title="Modifier"
+                            >
+                              <FaEdit size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
+                              title="Supprimer"
+                            >
+                              <FaTrashAlt size={16} />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Link 
+                            to="/dashboard/compte_rendu_analyste_cs" 
+                            className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                           >
-                            <FaTrashAlt size={16} />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link 
-                          to="/dashboard/compte_rendu_analyste_cs" 
-                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        >
-                          <FaEllipsisH size={16} />
-                        </Link>
-                      </td>
-                    </>
-                  )}
+                            <FaEllipsisH size={16} />
+                          </Link>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="12" className="px-6 py-4 text-center text-gray-500">
+                    Aucun candidat trouvé
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaDownload, FaUpload, FaSearch } from 'react-icons/fa';
 
 const Ia = () => {
   const [candidates, setCandidates] = useState([
@@ -17,6 +17,8 @@ const Ia = () => {
       lienCompteRendu: "https://www.compte_rendu.com/1"
     }
   ]);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   const feedbackOptions = [
     "En attente",
@@ -128,7 +130,7 @@ const Ia = () => {
       setNewCandidate({
         ...newCandidate,
         cvFile: file,
-        lienCV: URL.createObjectURL(file) // Crée un lien temporaire pour prévisualisation
+        lienCV: URL.createObjectURL(file)
       });
     }
   };
@@ -137,8 +139,6 @@ const Ia = () => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
     
-    // Ici vous devrez implémenter la logique pour uploader le fichier vers votre serveur
-    // Pour l'exemple, nous utilisons juste le nom du fichier
     const candidateToAdd = {
       id: newId,
       ...newCandidate,
@@ -166,9 +166,18 @@ const Ia = () => {
     setShowAddForm(!showAddForm);
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchQuery.trim());
+  };
+
+  const filteredCandidates = candidates.filter(candidate =>
+    candidate.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    candidate.prenom.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Modal pour afficher les détails */}
       {showModal && selectedCandidate && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -252,17 +261,33 @@ const Ia = () => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Ingénieur en Intéligence Artificielle</h2>
-        <button
-          onClick={toggleAddForm}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
-        >
-          <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
-        </button>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h2 className="text-2xl font-bold text-gray-800">Ingénieur en Intéligence Artificielle</h2>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher par nom ou prénom"
+              className="w-full md:w-64 border rounded px-3 py-2 pr-10"
+            />
+            <button
+              onClick={handleSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              <FaSearch size={16} />
+            </button>
+          </div>
+          <button
+            onClick={toggleAddForm}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
+          >
+            <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
+          </button>
+        </div>
       </div>
 
-      {/* Formulaire d'ajout */}
       {showAddForm && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau candidat</h3>
@@ -421,7 +446,7 @@ const Ia = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {candidates && candidates.map((item) => (
+              {filteredCandidates && filteredCandidates.map((item) => (
                 <tr className="hover:bg-gray-50 transition-colors duration-150" key={item.id}>
                   {editingId === item.id ? (
                     <>
