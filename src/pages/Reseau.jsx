@@ -14,7 +14,8 @@ const Reseau = () => {
       commentaireRh: "Aucun",
       Recruteur: "Recruteur 1",
       lienCV: "/cv/1",
-      lienCompteRendu: "https://www.compte_rendu.com/1"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte_rendu/1.pdf"
     },
     {
       id: 2,
@@ -26,7 +27,8 @@ const Reseau = () => {
       commentaireRh: "Profil intéressant",
       Recruteur: "Recruteur 2",
       lienCV: "/cv/2",
-      lienCompteRendu: "https://www.compte_rendu.com/2"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte_rendu/2.pdf"
     },
     {
       id: 3,
@@ -38,7 +40,8 @@ const Reseau = () => {
       commentaireRh: "Compétences insuffisantes",
       Recruteur: "Recruteur 1",
       lienCV: "/cv/3",
-      lienCompteRendu: "https://www.compte_rendu.com/3"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte_rendu/3.pdf"
     }
   ]);
 
@@ -62,6 +65,7 @@ const Reseau = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
+    compteRenduFile: null,
     lienCompteRendu: ""
   });
 
@@ -78,11 +82,13 @@ const Reseau = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
+    compteRenduFile: null,
     lienCompteRendu: "",
     cvFile: null
   });
 
   const [fileName, setFileName] = useState("");
+  const [compteRenduFileName, setCompteRenduFileName] = useState("");
 
   // Fonction de recherche
   const filteredCandidates = candidates.filter(candidate => {
@@ -110,6 +116,7 @@ const Reseau = () => {
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
       lienCV: candidate.lienCV,
+      compteRenduFile: candidate.compteRenduFile,
       lienCompteRendu: candidate.lienCompteRendu
     });
   };
@@ -168,6 +175,29 @@ const Reseau = () => {
     }
   };
 
+  const handleCompteRenduFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCompteRenduFileName(file.name);
+      setNewCandidate({
+        ...newCandidate,
+        compteRenduFile: file,
+        lienCompteRendu: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  const handleEditCompteRenduFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditFormData({
+        ...editFormData,
+        compteRenduFile: file,
+        lienCompteRendu: URL.createObjectURL(file)
+      });
+    }
+  };
+
   const handleAddCandidate = (e) => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
@@ -175,7 +205,8 @@ const Reseau = () => {
     const candidateToAdd = {
       id: newId,
       ...newCandidate,
-      lienCV: fileName || "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
+      lienCV: fileName || "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf",
+      lienCompteRendu: compteRenduFileName || "CompteRendu_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
     };
     
     setCandidates([...candidates, candidateToAdd]);
@@ -188,10 +219,12 @@ const Reseau = () => {
       commentaireRh: "",
       Recruteur: "",
       lienCV: "",
+      compteRenduFile: null,
       lienCompteRendu: "",
       cvFile: null
     });
     setFileName("");
+    setCompteRenduFileName("");
     setShowAddForm(false);
   };
 
@@ -254,10 +287,6 @@ const Reseau = () => {
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(selectedCandidate.lienCV, '_blank', 'noopener,noreferrer');
-                    }}
                   >
                     <FaDownload className="text-blue-500" /> 
                     <span>Ouvrir CV</span>
@@ -265,17 +294,15 @@ const Reseau = () => {
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu</label>
-                  <div className="flex items-center gap-2">
-                    <a 
-                      href={selectedCandidate.lienCompteRendu} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
-                    >
-                      <FaFileAlt className="text-blue-500" /> 
-                      <span>{selectedCandidate.lienCompteRendu}</span>
-                    </a>
-                  </div>
+                  <a 
+                    href={selectedCandidate.lienCompteRendu} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
+                  >
+                    <FaFileAlt className="text-blue-500" /> 
+                    <span>Voir PDF</span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -417,14 +444,29 @@ const Reseau = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lien Compte Rendu</label>
-                <input
-                  type="url"
-                  name="lienCompteRendu"
-                  value={newCandidate.lienCompteRendu}
-                  onChange={handleAddFormChange}
-                  className="w-full border rounded px-3 py-2"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu (PDF)*</label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
+                    <div className="flex items-center gap-2">
+                      <FaUpload className="text-blue-500" />
+                      <span className="text-sm text-blue-600 font-medium">
+                        {compteRenduFileName || "Choisir un fichier PDF"}
+                      </span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={handleCompteRenduFileChange}
+                      className="hidden"
+                      required
+                    />
+                  </label>
+                  {compteRenduFileName && (
+                    <span className="text-sm text-gray-500 truncate max-w-xs">
+                      {compteRenduFileName}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
@@ -558,10 +600,9 @@ const Reseau = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
-                            type="text"
-                            name="lienCompteRendu"
-                            value={editFormData.lienCompteRendu}
-                            onChange={handleEditFormChange}
+                            type="file"
+                            accept=".pdf"
+                            onChange={handleEditCompteRenduFileChange}
                             className="border rounded px-2 py-1 w-full"
                           />
                         </td>
@@ -608,26 +649,21 @@ const Reseau = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              window.open(item.lienCV, '_blank', 'noopener,noreferrer');
-                            }}
                           >
                             <FaDownload className="text-blue-500" /> 
                             <span>Ouvrir CV</span>
                           </a>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <a 
-                              href={item.lienCompteRendu} 
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm truncate max-w-xs"
-                            >
-                              {item.lienCompteRendu}
-                            </a>
-                          </div>
+                          <a 
+                            href={item.lienCompteRendu} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                          >
+                            <FaFileAlt className="text-blue-500" /> 
+                            <span>Voir PDF</span>
+                          </a>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">

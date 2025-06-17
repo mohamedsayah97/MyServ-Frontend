@@ -1,58 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaDownload, FaUpload, FaSearch } from 'react-icons/fa';
-
+import {
+  FaEye,
+  FaEdit,
+  FaTrashAlt,
+  FaPlus,
+  FaFileAlt,
+  FaEllipsisH,
+  FaTimes,
+  FaDownload,
+  FaUpload,
+  FaSearch,
+} from "react-icons/fa";
+import { instance } from "../../config/axios";
 const Cloud = () => {
-  const [candidates, setCandidates] = useState([
-    {
-      id: 1,
-      nom: "Dupont",
-      prenom: "Jean",
-      dateEntretien: "2023-10-01",
-      heureEntretien: "10:00",
-      feedback: "En attente",
-      commentaireRh: "Aucun",
-      Recruteur: "Recruteur 1",
-      lienCV: "/cv/1",
-      lienCompteRendu: "https://www.compte_rendu.com/1"
-    },
-    {
-      id: 2,
-      nom: "Martin",
-      prenom: "Sophie",
-      dateEntretien: "2023-10-05",
-      heureEntretien: "14:30",
-      feedback: "Validé RH",
-      commentaireRh: "Profil très intéressant",
-      Recruteur: "Recruteur 2",
-      lienCV: "/cv/2",
-      lienCompteRendu: "https://www.compte_rendu.com/2"
-    },
-    {
-      id: 3,
-      nom: "Bernard",
-      prenom: "Luc",
-      dateEntretien: "2023-10-10",
-      heureEntretien: "09:00",
-      feedback: "Non validé technique",
-      commentaireRh: "Manque d'expérience",
-      Recruteur: "Recruteur 1",
-      lienCV: "/cv/3",
-      lienCompteRendu: "https://www.compte_rendu.com/3"
-    },
-    {
-      id: 4,
-      nom: "Petit",
-      prenom: "Alice",
-      dateEntretien: "2023-10-12",
-      heureEntretien: "11:00",
-      feedback: "Recruté",
-      commentaireRh: "Excellent match",
-      Recruteur: "Recruteur 3",
-      lienCV: "/cv/4",
-      lienCompteRendu: "https://www.compte_rendu.com/4"
-    }
-  ]);
+  const [candidates, setCandidates] = useState([]);
 
   const feedbackOptions = [
     "En attente",
@@ -60,7 +22,7 @@ const Cloud = () => {
     "Non validé RH",
     "Validé technique",
     "Non validé technique",
-    "Recruté"
+    "Recruté",
   ];
 
   const [editingId, setEditingId] = useState(null);
@@ -73,14 +35,14 @@ const Cloud = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
-    lienCompteRendu: ""
+    lien_compteRendu: "",
   });
 
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [loadingList, setLoadingList] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
     nom: "",
     prenom: "",
@@ -90,32 +52,65 @@ const Cloud = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
-    lienCompteRendu: "",
-    cvFile: null
+    lien_compteRendu: "",
+    cvFile: null,
   });
+  const [callBack, setCallBack] = useState(false);
 
   const [fileName, setFileName] = useState("");
 
   // Fonction de recherche
-  const filteredCandidates = candidates.filter(candidate => {
-    const searchLower = searchTerm.toLowerCase();
+  const filteredCandidates = candidates.filter((candidate) => {
+    const searchLower = searchTerm?.toLowerCase();
     return (
-      candidate.nom.toLowerCase().includes(searchLower) ||
-      candidate.prenom.toLowerCase().includes(searchLower) ||
-      candidate.Recruteur.toLowerCase().includes(searchLower) ||
-      candidate.feedback.toLowerCase().includes(searchLower) ||
-      candidate.commentaireRh.toLowerCase().includes(searchLower) ||
-      candidate.dateEntretien.includes(searchTerm) ||
-      candidate.heureEntretien.includes(searchTerm) ||
-      candidate.id.toString().includes(searchTerm)
+      candidate.nom?.toLowerCase().includes(searchLower) ||
+      candidate.prenom?.toLowerCase().includes(searchLower) ||
+      candidate?.Recruteur?.toLowerCase().includes(searchLower) ||
+      candidate.feedback?.toLowerCase().includes(searchLower) ||
+      candidate.commentaireRh?.toLowerCase().includes(searchLower) ||
+      candidate.dateEntretien?.includes(searchTerm) ||
+      candidate.heureEntretien?.includes(searchTerm) ||
+      candidate.id?.toString()?.includes(searchTerm)
     );
   });
+  // recupérer la liste des candidats depuis l'API
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
+        setLoadingList(true);
+        const response = await instance.get("/candidates/list", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log(response);
+        setCandidates(response.data.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des candidats:", error);
+      } finally {
+        setLoadingList(false);
+      }
+    };
+    fetchCandidates();
 
-  const handleDelete = (id) => {
-    const updatedCandidates = candidates.filter(candidate => candidate.id !== id);
-    setCandidates(updatedCandidates);
+    return () => {};
+  }, [callBack]);
+
+  const handleDelete = async (id) => {
+    // axios part
+    try {
+      const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
+      await instance.delete(`/candidates/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const updatedCandidates = candidates.filter(
+        (candidate) => candidate.id !== id
+      );
+      setCandidates(updatedCandidates);
+      console.log("Candidat supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du candidat:", error);
+    }
   };
-
   const handleEditClick = (candidate) => {
     setEditingId(candidate.id);
     setEditFormData({
@@ -127,7 +122,7 @@ const Cloud = () => {
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
       lienCV: candidate.lienCV,
-      lienCompteRendu: candidate.lienCompteRendu
+      lien_compteRendu: candidate.lien_compteRendu,
     });
   };
 
@@ -140,13 +135,25 @@ const Cloud = () => {
     const { name, value } = e.target;
     setEditFormData({
       ...editFormData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleEditFormSubmit = (e) => {
     e.preventDefault();
-    const updatedCandidates = candidates.map(candidate => {
+    // axios part
+    // try {
+    //   const res = await instance.post("/candidates/create", {
+    //     ...newCandidate,
+    //     lienCV: fileName ? newCandidate.lienCV : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
+    //   });
+    //   console.log("Candidate added:", res.data);
+    //  localStorage.setItem('addToken', res.data.addToken);
+
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    const updatedCandidates = candidates.map((candidate) => {
       if (candidate.id === editingId) {
         return { ...candidate, ...editFormData };
       }
@@ -169,7 +176,7 @@ const Cloud = () => {
     const { name, value } = e.target;
     setNewCandidate({
       ...newCandidate,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -180,19 +187,42 @@ const Cloud = () => {
       setNewCandidate({
         ...newCandidate,
         cvFile: file,
-        lienCV: URL.createObjectURL(file)
+        lienCV: URL.createObjectURL(file),
       });
     }
   };
 
-  const handleAddCandidate = (e) => {
+  const handleAddCandidate = async (e) => {
     e.preventDefault();
-    const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
+    // axios part
+    try {
+      const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
+      const res = await instance.post(
+        "/candidates/create",
+        {
+          ...newCandidate,
+          lienCV: fileName
+            ? newCandidate.lienCV
+            : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf",
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Candidate added:", res.data);
+      setCallBack(!callBack); // Trigger a re-fetch of candidates
+    } catch (error) {
+      console.log(error);
+    }
+    const newId =
+      candidates.length > 0 ? Math.max(...candidates.map((c) => c.id)) + 1 : 1;
 
     const candidateToAdd = {
       id: newId,
       ...newCandidate,
-      lienCV: fileName ? newCandidate.lienCV : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf" // Use the actual file URL if uploaded, otherwise a placeholder
+      lienCV: fileName
+        ? newCandidate.lienCV
+        : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf", // Use the actual file URL if uploaded, otherwise a placeholder
     };
 
     setCandidates([...candidates, candidateToAdd]);
@@ -205,8 +235,8 @@ const Cloud = () => {
       commentaireRh: "",
       Recruteur: "",
       lienCV: "",
-      lienCompteRendu: "",
-      cvFile: null
+      lien_compteRendu: "",
+      cvFile: null,
     });
     setFileName("");
     setShowAddForm(false);
@@ -215,6 +245,16 @@ const Cloud = () => {
   const toggleAddForm = () => {
     setShowAddForm(!showAddForm);
   };
+  //Bonus: Add a function to handle the search input change
+  if (loadingList) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="loader">
+          <h1>Loading....</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -224,48 +264,86 @@ const Cloud = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b px-6 py-4">
               <h3 className="text-xl font-semibold text-gray-800">
-                Détails du candidat: {selectedCandidate.nom} {selectedCandidate.prenom}
+                Détails du candidat: {selectedCandidate.nom}{" "}
+                {selectedCandidate.prenom}
               </h3>
-              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
                 <FaTimes size={20} />
               </button>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.id}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ID
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.id}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.nom}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nom
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.nom}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.prenom}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Prénom
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.prenom}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Entretien</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.dateEntretien}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date Entretien
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.dateEntretien}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Heure Entretien</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.heureEntretien}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Heure Entretien
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.heureEntretien}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Recruteur</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.Recruteur}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Recruteur
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.Recruteur}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                  <div className="p-2 bg-gray-100 rounded">{selectedCandidate.feedback}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Statut
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.feedback}
+                  </div>
                 </div>
                 <div className="mb-4 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
-                  <div className="p-2 bg-gray-100 rounded min-h-[80px]">{selectedCandidate.commentaireRh}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Commentaire RH
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded min-h-[80px]">
+                    {selectedCandidate.commentaireRh}
+                  </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">CV</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    CV
+                  </label>
                   <a
                     href={selectedCandidate.lienCV}
                     target="_blank"
@@ -277,9 +355,11 @@ const Cloud = () => {
                   </a>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Compte Rendu
+                  </label>
                   <a
-                    href={selectedCandidate.lienCompteRendu}
+                    href={selectedCandidate.lien_compteRendu}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
@@ -304,7 +384,9 @@ const Cloud = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div className="w-full md:w-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Ingénieur Systéme & Cloud</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">
+            Ingénieur Systéme & Cloud
+          </h2>
         </div>
 
         <div className="w-full md:w-auto flex flex-col md:flex-row gap-4">
@@ -326,7 +408,8 @@ const Cloud = () => {
             onClick={toggleAddForm}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
           >
-            <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
+            <FaPlus className="text-sm" />{" "}
+            {showAddForm ? "Annuler" : "Ajouter Candidat"}
           </button>
         </div>
       </div>
@@ -334,11 +417,15 @@ const Cloud = () => {
       {/* Formulaire d'ajout */}
       {showAddForm && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau candidat</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Ajouter un nouveau candidat
+          </h3>
           <form onSubmit={handleAddCandidate}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom*
+                </label>
                 <input
                   type="text"
                   name="nom"
@@ -349,7 +436,9 @@ const Cloud = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Prénom*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Prénom*
+                </label>
                 <input
                   type="text"
                   name="prenom"
@@ -360,7 +449,9 @@ const Cloud = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date Entretien*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date Entretien*
+                </label>
                 <input
                   type="date"
                   name="dateEntretien"
@@ -371,7 +462,9 @@ const Cloud = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Heure Entretien*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Heure Entretien*
+                </label>
                 <input
                   type="time"
                   name="heureEntretien"
@@ -382,7 +475,9 @@ const Cloud = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Recruteur*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Recruteur*
+                </label>
                 <input
                   type="text"
                   name="Recruteur"
@@ -393,7 +488,9 @@ const Cloud = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Statut
+                </label>
                 <select
                   name="feedback"
                   value={newCandidate.feedback}
@@ -401,12 +498,16 @@ const Cloud = () => {
                   className="w-full border rounded px-3 py-2"
                 >
                   {feedbackOptions.map((option, index) => (
-                    <option key={index} value={option}>{option}</option>
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">CV*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  CV*
+                </label>
                 <div className="flex items-center gap-2">
                   <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
                     <div className="flex items-center gap-2">
@@ -431,17 +532,21 @@ const Cloud = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lien Compte Rendu</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Lien Compte Rendu
+                </label>
                 <input
                   type="url"
-                  name="lienCompteRendu"
-                  value={newCandidate.lienCompteRendu}
+                  name="lien_compteRendu"
+                  value={newCandidate.lien_compteRendu}
                   onChange={handleAddFormChange}
                   className="w-full border rounded px-3 py-2"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Commentaire RH
+                </label>
                 <textarea
                   name="commentaireRh"
                   value={newCandidate.commentaireRh}
@@ -475,208 +580,257 @@ const Cloud = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Entretien</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire RH</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recruteur</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CV</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compte Rendu</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plus</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Nom
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Prénom
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date Entretien
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Heure
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Commentaire RH
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Recruteur
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  CV
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Compte Rendu
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Plus
+                </th>
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCandidates && filteredCandidates.map((item) => (
-                <tr className="hover:bg-gray-50 transition-colors duration-150" key={item.id}>
-                  {editingId === item.id ? (
-                    <>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="nom"
-                          value={editFormData.nom}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="prenom"
-                          value={editFormData.prenom}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="date"
-                          name="dateEntretien"
-                          value={editFormData.dateEntretien}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="time"
-                          name="heureEntretien"
-                          value={editFormData.heureEntretien}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          name="feedback"
-                          value={editFormData.feedback}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          {feedbackOptions.map((option, index) => (
-                            <option key={index} value={option}>{option}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <textarea
-                          name="commentaireRh"
-                          value={editFormData.commentaireRh}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                          rows="2"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="Recruteur"
-                          value={editFormData.Recruteur}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {/* Simplifié pour l'édition de lien CV existant, pas d'upload ici */}
-                        <input
-                          type="text" // Change to text for direct URL input during edit, or provide a separate file input
-                          name="lienCV"
-                          value={editFormData.lienCV}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                          placeholder="Lien CV"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          name="lienCompteRendu"
-                          value={editFormData.lienCompteRendu}
-                          onChange={handleEditFormChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={handleEditFormSubmit}
-                            className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
-                            title="Enregistrer"
+              {filteredCandidates &&
+                filteredCandidates.map((item, index) => (
+                  <tr
+                    className="hover:bg-gray-50 transition-colors duration-150"
+                    key={index}
+                  >
+                    {editingId === item.id ? (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {item.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="nom"
+                            value={editFormData.nom}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="prenom"
+                            value={editFormData.prenom}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="date"
+                            name="dateEntretien"
+                            value={editFormData.dateEntretien}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="time"
+                            name="heureEntretien"
+                            value={editFormData.heureEntretien}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <select
+                            name="feedback"
+                            value={editFormData.feedback}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
                           >
-                            ✓
-                          </button>
-                          <button
-                            onClick={handleCancelClick}
-                            className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
-                            title="Annuler"
+                            {feedbackOptions.map((option, index) => (
+                              <option key={index} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <textarea
+                            name="commentaireRh"
+                            value={editFormData.commentaireRh}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                            rows="2"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="Recruteur"
+                            value={editFormData.Recruteur}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {/* Simplifié pour l'édition de lien CV existant, pas d'upload ici */}
+                          <input
+                            type="text" // Change to text for direct URL input during edit, or provide a separate file input
+                            name="lienCV"
+                            value={editFormData.lienCV}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                            placeholder="Lien CV"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            name="lien_compteRendu"
+                            value={editFormData.lien_compteRendu}
+                            onChange={handleEditFormChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={handleEditFormSubmit}
+                              className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
+                              title="Enregistrer"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={handleCancelClick}
+                              className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
+                              title="Annuler"
+                            >
+                              ✗
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Link
+                            to="/dashboard/compte_rendu_cloud"
+                            className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                           >
-                            ✗
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          to="/dashboard/compte_rendu_cloud"
-                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        >
-                          <FaEllipsisH size={16} />
-                        </Link>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{item.nom}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.prenom}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dateEntretien}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.heureEntretien}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedback}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.commentaireRh}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.Recruteur}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <a
-                          href={item.lienCV}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          <FaDownload className="text-blue-500" />
-                          <span>Télécharger</span>
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <a
-                          href={item.lienCompteRendu}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          <FaFileAlt className="text-blue-500" />
-                          <span>Voir</span>
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => handleViewClick(item)}
-                            className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-100 transition-colors"
-                            title="Voir détails"
+                            <FaEllipsisH size={16} />
+                          </Link>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {item.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                          {item.nom}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.prenom}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.dateEntretien}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.heureEntretien}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.feedback}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.commentaireRh}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.Recruteur}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a
+                            href={item.lienCV}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                           >
-                            <FaEye size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
-                            title="Modifier"
+                            <FaDownload className="text-blue-500" />
+                            <span>Télécharger</span>
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a
+                            href={item.lien_compteRendu}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                           >
-                            <FaEdit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
-                            title="Supprimer"
+                            <FaFileAlt className="text-blue-500" />
+                            <span>Voir</span>
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleViewClick(item)}
+                              className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-100 transition-colors"
+                              title="Voir détails"
+                            >
+                              <FaEye size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-100 transition-colors"
+                              title="Modifier"
+                            >
+                              <FaEdit size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
+                              title="Supprimer"
+                            >
+                              <FaTrashAlt size={16} />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Link
+                            to="/dashboard/compte_rendu_cloud"
+                            className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
                           >
-                            <FaTrashAlt size={16} />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          to="/dashboard/compte_rendu_cloud"
-                          className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        >
-                          <FaEllipsisH size={16} />
-                        </Link>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
+                            <FaEllipsisH size={16} />
+                          </Link>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

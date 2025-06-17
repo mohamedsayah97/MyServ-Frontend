@@ -14,7 +14,8 @@ const AnalysteCS = () => {
       commentaireRh: "Aucun",
       Recruteur: "Recruteur 1",
       lienCV: "/cv/1",
-      lienCompteRendu: "https://www.compte_rendu.com/1"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte-rendu/1.pdf"
     },
     {
       id: 2,
@@ -26,7 +27,8 @@ const AnalysteCS = () => {
       commentaireRh: "Profil intéressant",
       Recruteur: "Recruteur 2",
       lienCV: "/cv/2",
-      lienCompteRendu: "https://www.compte_rendu.com/2"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte-rendu/2.pdf"
     },
     {
       id: 3,
@@ -38,7 +40,8 @@ const AnalysteCS = () => {
       commentaireRh: "Compétences insuffisantes",
       Recruteur: "Recruteur 1",
       lienCV: "/cv/3",
-      lienCompteRendu: "https://www.compte_rendu.com/3"
+      compteRenduFile: null,
+      lienCompteRendu: "/compte-rendu/3.pdf"
     }
   ]);
 
@@ -61,6 +64,7 @@ const AnalysteCS = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
+    compteRenduFile: null,
     lienCompteRendu: ""
   });
 
@@ -78,13 +82,14 @@ const AnalysteCS = () => {
     commentaireRh: "",
     Recruteur: "",
     lienCV: "",
+    compteRenduFile: null,
     lienCompteRendu: "",
     cvFile: null
   });
 
   const [fileName, setFileName] = useState("");
+  const [compteRenduFileName, setCompteRenduFileName] = useState("");
 
-  // Fonction de filtrage des candidats
   const filteredCandidates = candidates.filter(candidate => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -111,6 +116,7 @@ const AnalysteCS = () => {
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
       lienCV: candidate.lienCV,
+      compteRenduFile: candidate.compteRenduFile,
       lienCompteRendu: candidate.lienCompteRendu
     });
   };
@@ -169,14 +175,34 @@ const AnalysteCS = () => {
     }
   };
 
+  const handleCompteRenduFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCompteRenduFileName(file.name);
+      setNewCandidate({
+        ...newCandidate,
+        compteRenduFile: file,
+        lienCompteRendu: URL.createObjectURL(file)
+      });
+    }
+  };
+
   const handleAddCandidate = (e) => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
     
     const candidateToAdd = {
       id: newId,
-      ...newCandidate,
-      lienCV: fileName || "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
+      nom: newCandidate.nom,
+      prenom: newCandidate.prenom,
+      dateEntretien: newCandidate.dateEntretien,
+      heureEntretien: newCandidate.heureEntretien,
+      feedback: newCandidate.feedback,
+      commentaireRh: newCandidate.commentaireRh,
+      Recruteur: newCandidate.Recruteur,
+      lienCV: fileName || "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf",
+      compteRenduFile: newCandidate.compteRenduFile,
+      lienCompteRendu: compteRenduFileName || "CompteRendu_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
     };
     
     setCandidates([...candidates, candidateToAdd]);
@@ -189,10 +215,12 @@ const AnalysteCS = () => {
       commentaireRh: "",
       Recruteur: "",
       lienCV: "",
+      compteRenduFile: null,
       lienCompteRendu: "",
       cvFile: null
     });
     setFileName("");
+    setCompteRenduFileName("");
     setShowAddForm(false);
   };
 
@@ -202,7 +230,6 @@ const AnalysteCS = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Modal pour afficher les détails */}
       {showModal && selectedCandidate && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -262,15 +289,19 @@ const AnalysteCS = () => {
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu</label>
-                  <a 
-                    href={selectedCandidate.lienCompteRendu} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
-                  >
-                    <FaFileAlt className="text-blue-500" /> 
-                    <span>Voir</span>
-                  </a>
+                  {selectedCandidate.lienCompteRendu ? (
+                    <a 
+                      href={selectedCandidate.lienCompteRendu} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
+                    >
+                      <FaFileAlt className="text-blue-500" /> 
+                      <span>Voir PDF</span>
+                    </a>
+                  ) : (
+                    <div className="p-2 bg-gray-100 rounded text-gray-500">Aucun fichier</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -289,7 +320,6 @@ const AnalysteCS = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Analyste CyberSécurité</h2>
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          {/* Barre de recherche */}
           <div className="relative w-full md:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FaSearch className="text-gray-400" />
@@ -312,7 +342,6 @@ const AnalysteCS = () => {
         </div>
       </div>
 
-      {/* Formulaire d'ajout */}
       {showAddForm && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau candidat</h3>
@@ -411,16 +440,30 @@ const AnalysteCS = () => {
                   )}
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lien Compte Rendu</label>
-                <input
-                  type="url"
-                  name="lienCompteRendu"
-                  value={newCandidate.lienCompteRendu}
-                  onChange={handleAddFormChange}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu (PDF)</label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
+                    <div className="flex items-center gap-2">
+                      <FaUpload className="text-blue-500" />
+                      <span className="text-sm text-blue-600 font-medium">
+                        {compteRenduFileName || "Choisir un fichier PDF"}
+                      </span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={handleCompteRenduFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {compteRenduFileName && (
+                    <span className="text-sm text-gray-500 truncate max-w-xs">
+                      {compteRenduFileName}
+                    </span>
+                  )}
+                </div>
+              </div> */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
                 <textarea
@@ -553,11 +596,11 @@ const AnalysteCS = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
-                            type="text"
-                            name="lienCompteRendu"
-                            value={editFormData.lienCompteRendu}
-                            onChange={handleEditFormChange}
+                            type="file"
+                            name="compteRenduFile"
+                            onChange={handleCompteRenduFileChange}
                             className="border rounded px-2 py-1 w-full"
+                            accept=".pdf"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -609,15 +652,19 @@ const AnalysteCS = () => {
                           </a>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <a 
-                            href={item.lienCompteRendu} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            <FaFileAlt className="text-blue-500" /> 
-                            <span>Voir</span>
-                          </a>
+                          {item.lienCompteRendu ? (
+                            <a 
+                              href={item.lienCompteRendu} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              <FaFileAlt className="text-blue-500" /> 
+                              <span>Voir PDF</span>
+                            </a>
+                          ) : (
+                            <span className="text-sm text-gray-400">Aucun</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">

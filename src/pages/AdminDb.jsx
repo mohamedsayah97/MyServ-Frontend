@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaSearch } from 'react-icons/fa'; // Added FaSearch icon
+import { FaEye, FaEdit, FaTrashAlt, FaPlus, FaFileAlt, FaEllipsisH, FaTimes, FaSearch, FaDownload } from 'react-icons/fa';
 
 const AdminDb = () => {
   const [candidates, setCandidates] = useState([
@@ -13,8 +13,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "Jane Smith",
-      lienCompteRendu: "http://example.com/compte-rendu-1",
-      cvUrl: "http://example.com/cv-1.pdf"
+      compteRenduUrl: "/compte-rendu-1.pdf",
+      cvUrl: "/cv-1.pdf"
     },
     {
       id: 2,
@@ -25,8 +25,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "test test",
-      lienCompteRendu: "http://example.com/compte-rendu-2",
-      cvUrl: "http://example.com/cv-2.pdf"
+      compteRenduUrl: "/compte-rendu-2.pdf",
+      cvUrl: "/cv-2.pdf"
     },
     {
       id: 3,
@@ -37,8 +37,8 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "Strong candidate with relevant experience.",
       Recruteur: "test test",
-      lienCompteRendu: "http://example.com/compte-rendu-3",
-      cvUrl: "http://example.com/cv-3.pdf"
+      compteRenduUrl: "/compte-rendu-3.pdf",
+      cvUrl: "/cv-3.pdf"
     }
   ]);
 
@@ -60,14 +60,14 @@ const AdminDb = () => {
     feedback: "Choix feedback",
     commentaireRh: "",
     Recruteur: "",
-    lienCompteRendu: "",
+    compteRenduUrl: "",
     cvUrl: ""
   });
 
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [cvFile, setCvFile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [newCandidate, setNewCandidate] = useState({
     nom: "",
@@ -77,12 +77,14 @@ const AdminDb = () => {
     feedback: "Choix feedback",
     commentaireRh: "",
     Recruteur: "",
-    lienCompteRendu: "",
+    compteRenduFile: null,
+    compteRenduUrl: "",
+    cvFile: null,
     cvUrl: ""
   });
 
-  // New state for search query
-  const [searchQuery, setSearchQuery] = useState('');
+  const [cvFileName, setCvFileName] = useState("");
+  const [compteRenduFileName, setCompteRenduFileName] = useState("");
 
   useEffect(() => {
     fetch('http://localhost:5173/candidate')
@@ -106,7 +108,7 @@ const AdminDb = () => {
       feedback: candidate.feedback,
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
-      lienCompteRendu: candidate.lienCompteRendu,
+      compteRenduUrl: candidate.compteRenduUrl,
       cvUrl: candidate.cvUrl
     });
   };
@@ -153,17 +155,45 @@ const AdminDb = () => {
     });
   };
 
+  const handleCvFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCvFileName(file.name);
+      setNewCandidate({
+        ...newCandidate,
+        cvFile: file,
+        cvUrl: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  const handleCompteRenduFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCompteRenduFileName(file.name);
+      setNewCandidate({
+        ...newCandidate,
+        compteRenduFile: file,
+        compteRenduUrl: URL.createObjectURL(file)
+      });
+    }
+  };
+
   const handleAddCandidate = (e) => {
     e.preventDefault();
     const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
     
-    // Simuler l'upload du CV (dans une vraie application, vous utiliseriez une API)
-    const fakeCvUrl = `http://example.com/cv-${newId}.pdf`;
-    
     const candidateToAdd = {
       id: newId,
-      ...newCandidate,
-      cvUrl: fakeCvUrl
+      nom: newCandidate.nom,
+      prenom: newCandidate.prenom,
+      dateEntretien: newCandidate.dateEntretien,
+      heureEntretien: newCandidate.heureEntretien,
+      feedback: newCandidate.feedback,
+      commentaireRh: newCandidate.commentaireRh,
+      Recruteur: newCandidate.Recruteur,
+      compteRenduUrl: newCandidate.compteRenduUrl || `compte-rendu-${newId}.pdf`,
+      cvUrl: newCandidate.cvUrl || `cv-${newId}.pdf`
     };
     
     setCandidates([...candidates, candidateToAdd]);
@@ -175,10 +205,13 @@ const AdminDb = () => {
       feedback: "Choix feedback",
       commentaireRh: "",
       Recruteur: "",
-      lienCompteRendu: "",
+      compteRenduFile: null,
+      compteRenduUrl: "",
+      cvFile: null,
       cvUrl: ""
     });
-    setCvFile(null);
+    setCvFileName("");
+    setCompteRenduFileName("");
     setShowAddForm(false);
   };
 
@@ -186,7 +219,6 @@ const AdminDb = () => {
     setShowAddForm(!showAddForm);
   };
 
-  // Filter candidates based on search query
   const filteredCandidates = candidates.filter(candidate =>
     candidate.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
     candidate.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -196,7 +228,6 @@ const AdminDb = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Modal pour afficher les détails */}
       {showModal && selectedCandidate && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -242,7 +273,7 @@ const AdminDb = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
                   <div className="p-2 bg-gray-100 rounded min-h-[80px]">{selectedCandidate.commentaireRh}</div>
                 </div>
-                <div className="mb-4 md:col-span-2">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">CV du candidat</label>
                   <a 
                     href={selectedCandidate.cvUrl} 
@@ -250,21 +281,25 @@ const AdminDb = () => {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
                   >
-                    <FaFileAlt className="text-blue-500" /> 
-                    <span className="truncate">Télécharger le CV</span>
+                    <FaDownload className="text-blue-500" /> 
+                    <span>Télécharger le CV</span>
                   </a>
                 </div>
-                <div className="mb-4 md:col-span-2">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu</label>
-                  <a 
-                    href={selectedCandidate.lienCompteRendu} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
-                  >
-                    <FaFileAlt className="text-blue-500" /> 
-                    <span className="truncate">{selectedCandidate.lienCompteRendu}</span>
-                  </a>
+                  {selectedCandidate.compteRenduUrl ? (
+                    <a 
+                      href={selectedCandidate.compteRenduUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 p-2 bg-gray-100 rounded"
+                    >
+                      <FaFileAlt className="text-blue-500" /> 
+                      <span>Voir le compte rendu</span>
+                    </a>
+                  ) : (
+                    <div className="p-2 bg-gray-100 rounded text-gray-500">Aucun compte rendu</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -282,29 +317,29 @@ const AdminDb = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Administrateur Base de Données</h2>
-        <button
-          onClick={toggleAddForm}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
-        >
-          <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
-        </button>
-      </div>
-
-      {/* Search Input */}
-      <div className="mb-6">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Rechercher par nom, prénom, recruteur ou statut..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="relative w-full md:w-64">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaSearch className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher candidat..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <button
+            onClick={toggleAddForm}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
+          >
+            <FaPlus className="text-sm" /> {showAddForm ? 'Annuler' : 'Ajouter Candidat'}
+          </button>
         </div>
       </div>
 
-      {/* Formulaire d'ajout */}
       {showAddForm && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau candidat</h3>
@@ -379,25 +414,53 @@ const AdminDb = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lien Compte Rendu</label>
-                <input
-                  type="url"
-                  name="lienCompteRendu"
-                  value={newCandidate.lienCompteRendu}
-                  onChange={handleAddFormChange}
-                  className="w-full border rounded px-3 py-2"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">CV (PDF, DOC, DOCX)*</label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
+                    <div className="flex items-center gap-2">
+                      <FaDownload className="text-blue-500" />
+                      <span className="text-sm text-blue-600 font-medium">
+                        {cvFileName || "Choisir un fichier"}
+                      </span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleCvFileChange}
+                      className="hidden"
+                      required
+                    />
+                  </label>
+                  {cvFileName && (
+                    <span className="text-sm text-gray-500 truncate max-w-xs">
+                      {cvFileName}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">CV du candidat (PDF, DOC, DOCX)*</label>
-                <input
-                  type="file"
-                  name="cv"
-                  onChange={(e) => setCvFile(e.target.files[0])}
-                  className="w-full border rounded px-3 py-2"
-                  accept=".pdf,.doc,.docx"
-                  required
-                />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Compte Rendu (PDF)</label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
+                    <div className="flex items-center gap-2">
+                      <FaDownload className="text-blue-500" />
+                      <span className="text-sm text-blue-600 font-medium">
+                        {compteRenduFileName || "Choisir un fichier PDF"}
+                      </span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={handleCompteRenduFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {compteRenduFileName && (
+                    <span className="text-sm text-gray-500 truncate max-w-xs">
+                      {compteRenduFileName}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire RH</label>
@@ -525,26 +588,18 @@ const AdminDb = () => {
                           <input
                             type="file"
                             name="cv"
-                            onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                setEditFormData({
-                                  ...editFormData,
-                                  cvUrl: URL.createObjectURL(file)
-                                });
-                              }
-                            }}
+                            onChange={handleCvFileChange}
                             className="border rounded px-2 py-1 w-full"
                             accept=".pdf,.doc,.docx"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
-                            type="text"
-                            name="lienCompteRendu"
-                            value={editFormData.lienCompteRendu}
-                            onChange={handleEditFormChange}
+                            type="file"
+                            name="compteRendu"
+                            onChange={handleCompteRenduFileChange}
                             className="border rounded px-2 py-1 w-full"
+                            accept=".pdf"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -592,19 +647,23 @@ const AdminDb = () => {
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
                           >
                             <FaFileAlt className="text-blue-500" /> 
-                            <span className="truncate max-w-xs inline-block">CV</span>
+                            <span>CV</span>
                           </a>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <a 
-                            href={item.lienCompteRendu} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            <FaFileAlt className="text-blue-500" /> 
-                            <span className="truncate max-w-xs inline-block">{item.lienCompteRendu}</span>
-                          </a>
+                          {item.compteRenduUrl ? (
+                            <a 
+                              href={item.compteRenduUrl} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              <FaFileAlt className="text-blue-500" /> 
+                              <span>Compte rendu</span>
+                            </a>
+                          ) : (
+                            <span className="text-sm text-gray-400">Aucun</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
@@ -646,7 +705,7 @@ const AdminDb = () => {
               ) : (
                 <tr>
                   <td colSpan="12" className="px-6 py-4 text-center text-gray-500">
-                    Aucun candidat trouvé.
+                    Aucun candidat trouvé
                   </td>
                 </tr>
               )}
