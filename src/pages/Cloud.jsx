@@ -95,22 +95,45 @@ const Cloud = () => {
     return () => {};
   }, [callBack]);
 
+  // const handleDelete = async (id) => {
+  //   // axios part
+    
+     
+  //     const updatedCandidates = candidates.filter(
+  //       (candidate) => candidate.id !== id
+  //     );
+  //     setCandidates(updatedCandidates);
+      
+  // };
   const handleDelete = async (id) => {
-    // axios part
-    try {
-      const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
-      await instance.delete(`/candidates/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const updatedCandidates = candidates.filter(
-        (candidate) => candidate.id !== id
-      );
-      setCandidates(updatedCandidates);
-      console.log("Candidat supprimé avec succès");
-    } catch (error) {
-      console.error("Erreur lors de la suppression du candidat:", error);
-    }
-  };
+  try {
+    const res = await instance.delete(`/candidates/${id}`, { // Modifié ici
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+    
+    console.log("Candidate deleted:", res.data);
+    setCandidates(prev => prev.filter(c => c.id !== id));
+    
+  } catch (error) {
+    console.error("Erreur suppression:", error.res?.data?.message || error.message);
+    // Affichez un message d'erreur à l'utilisateur si nécessaire
+  }
+};
+//   const handleDelete = async (id) => {
+//   if (!id) {
+//     console.error("ID manquant. Données complètes :", { candidates });
+//     return;
+//   }
+
+//   try {
+//     await instance.delete(`/candidates/delete/${id}`, {
+//       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+//     });
+//     setCandidates(candidates.filter(c => c._id !== id)); // Filtre adapté
+//   } catch (error) {
+//     console.error("Erreur :", error.response?.data);
+//   }
+// };
   const handleEditClick = (candidate) => {
     setEditingId(candidate.id);
     setEditFormData({
@@ -189,8 +212,7 @@ const Cloud = () => {
         cvFile: file,
         lienCV: URL.createObjectURL(file),
       });
-    }
-  };
+    }  };
 
   const handleAddCandidate = async (e) => {
     e.preventDefault();
@@ -257,6 +279,7 @@ const Cloud = () => {
   }
 
   return (
+    
     <div className="container mx-auto px-4 py-8">
       {/* Modal pour afficher les détails */}
       {showModal && selectedCandidate && (
@@ -810,11 +833,16 @@ const Cloud = () => {
                             >
                               <FaEdit size={16} />
                             </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition-colors"
-                              title="Supprimer"
+                              <button
+                                onClick={() => {
+                                console.log("Item cliqué :", item); // Debug
+                                handleDelete(item._id); // Adaptez à votre clé
+                              }}
+                              className="text-red-600 hover:text-red-900..."
                             >
+
+                              Supprimer
+
                               <FaTrashAlt size={16} />
                             </button>
                           </div>
