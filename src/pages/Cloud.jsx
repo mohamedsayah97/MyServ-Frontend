@@ -15,6 +15,7 @@ import {
 import { instance } from "../../config/axios";
 const Cloud = () => {
   const [candidates, setCandidates] = useState([]);
+  const [recruteurs, setRecruteurs] = useState([]);
 
   const feedbackOptions = [
     "En attente",
@@ -42,6 +43,7 @@ const Cloud = () => {
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [compteRenduFileName, setCompteRenduFileName] = useState("");
   const [loadingList, setLoadingList] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
     nom: "",
@@ -53,6 +55,7 @@ const Cloud = () => {
     Recruteur: "",
     lienCV: "",
     lien_compteRendu: "",
+    compteRenduFile: null,
     cvFile: null,
   });
   const [callBack, setCallBack] = useState(false);
@@ -73,6 +76,18 @@ const Cloud = () => {
       candidate.id?.toString()?.includes(searchTerm)
     );
   });
+
+  const handleCompteRenduFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCompteRenduFileName(file.name);
+      setNewCandidate({
+        ...newCandidate,
+        compteRenduFile: file,
+        lien_compteRendu: URL.createObjectURL(file),
+      });
+    }
+  };
   // recupérer la liste des candidats depuis l'API
   useEffect(() => {
     const fetchCandidates = async () => {
@@ -91,49 +106,70 @@ const Cloud = () => {
       }
     };
     fetchCandidates();
+    const fetchRecruteurs = async () => {
+      try {
+        const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
+        const response = await instance.get("/users/list", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setRecruteurs(response.data.data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des recruteurs:", error);
+      }
+    };
+    fetchRecruteurs();
 
     return () => {};
   }, [callBack]);
 
+  const formatTimestampToDate = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toISOString().split("T")[0];
+  };
+
   // const handleDelete = async (id) => {
   //   // axios part
-    
-     
+
   //     const updatedCandidates = candidates.filter(
   //       (candidate) => candidate.id !== id
   //     );
   //     setCandidates(updatedCandidates);
-      
+
   // };
   const handleDelete = async (id) => {
-  try {
-    const res = await instance.delete(`/candidates/${id}`, { // Modifié ici
-      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-    });
-    
-    console.log("Candidate deleted:", res.data);
-    setCandidates(prev => prev.filter(c => c.id !== id));
-    
-  } catch (error) {
-    console.error("Erreur suppression:", error.res?.data?.message || error.message);
-    // Affichez un message d'erreur à l'utilisateur si nécessaire
-  }
-};
-//   const handleDelete = async (id) => {
-//   if (!id) {
-//     console.error("ID manquant. Données complètes :", { candidates });
-//     return;
-//   }
+    try {
+      const res = await instance.delete(`/candidates/${id}`, {
+        // Modifié ici
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
-//   try {
-//     await instance.delete(`/candidates/delete/${id}`, {
-//       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-//     });
-//     setCandidates(candidates.filter(c => c._id !== id)); // Filtre adapté
-//   } catch (error) {
-//     console.error("Erreur :", error.response?.data);
-//   }
-// };
+      console.log("Candidate deleted:", res.data);
+      setCandidates((prev) => prev.filter((c) => c.id !== id));
+    } catch (error) {
+      console.error(
+        "Erreur suppression:",
+        error.res?.data?.message || error.message
+      );
+      // Affichez un message d'erreur à l'utilisateur si nécessaire
+    }
+  };
+  //   const handleDelete = async (id) => {
+  //   if (!id) {
+  //     console.error("ID manquant. Données complètes :", { candidates });
+  //     return;
+  //   }
+
+  //   try {
+  //     await instance.delete(`/candidates/delete/${id}`, {
+  //       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+  //     });
+  //     setCandidates(candidates.filter(c => c._id !== id)); // Filtre adapté
+  //   } catch (error) {
+  //     console.error("Erreur :", error.response?.data);
+  //   }
+  // };
   const handleEditClick = (candidate) => {
     setEditingId(candidate.id);
     setEditFormData({
@@ -149,9 +185,42 @@ const Cloud = () => {
     });
   };
 
-  const handleViewClick = (candidate) => {
-    setSelectedCandidate(candidate);
-    setShowModal(true);
+  const handleViewClick = async (candidate) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await instance.get(`/candidates/${candidate._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Vérification des données reçues
+      if (!response.data || !response.data.data) {
+        throw new Error("Réponse invalide de l'API");
+      }
+
+      // Mise à jour de l'état avec les nouvelles données
+      setSelectedCandidate(response.data.data);
+      setShowModal(true);
+
+      // Optionnel : Mise à jour locale dans la liste
+      setCandidates((prev) =>
+        prev.map((c) => (c._id === candidate._id ? response.data.data : c))
+      );
+    } catch (error) {
+      console.error("Erreur détaillée:", {
+        message: error.message,
+        response: error.response?.data,
+        config: error.config,
+      });
+
+      // Fallback : afficher les données en cache si la requête échoue
+      setSelectedCandidate(candidate);
+      setShowModal(true);
+
+      alert(`Détails partiels (hors ligne) : ${error.message}`);
+    }
   };
 
   const handleEditFormChange = (e) => {
@@ -165,17 +234,16 @@ const Cloud = () => {
   const handleEditFormSubmit = (e) => {
     e.preventDefault();
     // axios part
-    // try {
-    //   const res = await instance.post("/candidates/create", {
-    //     ...newCandidate,
-    //     lienCV: fileName ? newCandidate.lienCV : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf"
-    //   });
-    //   console.log("Candidate added:", res.data);
-    //  localStorage.setItem('addToken', res.data.addToken);
-
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
+      const res = instance.put(`/candidates/${editingId}`, editFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Candidate updated:", res.data);
+      setCallBack(!callBack); // Trigger a re-fetch of candidates
+    } catch (error) {
+      console.log(error);
+    }
     const updatedCandidates = candidates.map((candidate) => {
       if (candidate.id === editingId) {
         return { ...candidate, ...editFormData };
@@ -212,7 +280,8 @@ const Cloud = () => {
         cvFile: file,
         lienCV: URL.createObjectURL(file),
       });
-    }  };
+    }
+  };
 
   const handleAddCandidate = async (e) => {
     e.preventDefault();
@@ -226,6 +295,13 @@ const Cloud = () => {
           lienCV: fileName
             ? newCandidate.lienCV
             : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf",
+          lien_compteRendu: compteRenduFileName
+            ? newCandidate.lien_compteRendu
+            : "Compte_Rendu_" +
+              newCandidate.nom +
+              "_" +
+              newCandidate.prenom +
+              ".pdf",
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -244,7 +320,14 @@ const Cloud = () => {
       ...newCandidate,
       lienCV: fileName
         ? newCandidate.lienCV
-        : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf", // Use the actual file URL if uploaded, otherwise a placeholder
+        : "CV_" + newCandidate.nom + "_" + newCandidate.prenom + ".pdf",
+      lien_compteRendu: compteRenduFileName
+        ? newCandidate.lien_compteRendu
+        : "Compte_Rendu_" +
+          newCandidate.nom +
+          "_" +
+          newCandidate.prenom +
+          ".pdf",
     };
 
     setCandidates([...candidates, candidateToAdd]);
@@ -267,6 +350,7 @@ const Cloud = () => {
   const toggleAddForm = () => {
     setShowAddForm(!showAddForm);
   };
+  console.log(recruteurs);
   //Bonus: Add a function to handle the search input change
   if (loadingList) {
     return (
@@ -279,7 +363,6 @@ const Cloud = () => {
   }
 
   return (
-    
     <div className="container mx-auto px-4 py-8">
       {/* Modal pour afficher les détails */}
       {showModal && selectedCandidate && (
@@ -328,7 +411,7 @@ const Cloud = () => {
                     Date Entretien
                   </label>
                   <div className="p-2 bg-gray-100 rounded">
-                    {selectedCandidate.dateEntretien}
+                    {formatTimestampToDate(selectedCandidate.dateEntretien)}
                   </div>
                 </div>
                 <div className="mb-4">
@@ -363,6 +446,7 @@ const Cloud = () => {
                     {selectedCandidate.commentaireRh}
                   </div>
                 </div>
+                
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     CV
@@ -501,14 +585,21 @@ const Cloud = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Recruteur*
                 </label>
-                <input
-                  type="text"
-                  name="Recruteur"
-                  value={newCandidate.Recruteur}
-                  onChange={handleAddFormChange}
+                <select
                   className="w-full border rounded px-3 py-2"
+                  onChange={handleAddFormChange}
+                  name="recruteur"
                   required
-                />
+                >
+                  <option value="" disabled defaultValue>
+                    Sélectionner un recruteur
+                  </option>
+                  {recruteurs.map((candidate) => (
+                    <option key={candidate._id} value={candidate._id}>
+                      {candidate.nom}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -556,15 +647,29 @@ const Cloud = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Lien Compte Rendu
+                  Compte Rendu (PDF)
                 </label>
-                <input
-                  type="url"
-                  name="lien_compteRendu"
-                  value={newCandidate.lien_compteRendu}
-                  onChange={handleAddFormChange}
-                  className="w-full border rounded px-3 py-2"
-                />
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex flex-col items-center px-4 py-2 bg-white rounded-lg border border-blue-500 cursor-pointer hover:bg-blue-50">
+                    <div className="flex items-center gap-2">
+                      <FaDownload className="text-blue-500" />
+                      <span className="text-sm text-blue-600 font-medium">
+                        {compteRenduFileName || "Choisir un fichier PDF"}
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleCompteRenduFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {compteRenduFileName && (
+                    <span className="text-sm text-gray-500 truncate max-w-xs">
+                      {compteRenduFileName}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -658,7 +763,7 @@ const Cloud = () => {
                           <input
                             type="text"
                             name="nom"
-                            value={editFormData.nom}
+                            value={item.nom}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
@@ -667,7 +772,7 @@ const Cloud = () => {
                           <input
                             type="text"
                             name="prenom"
-                            value={editFormData.prenom}
+                            value={item.prenom}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
@@ -676,7 +781,7 @@ const Cloud = () => {
                           <input
                             type="date"
                             name="dateEntretien"
-                            value={editFormData.dateEntretien}
+                            value={formatTimestampToDate(item.dateEntretien)}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
@@ -685,7 +790,7 @@ const Cloud = () => {
                           <input
                             type="time"
                             name="heureEntretien"
-                            value={editFormData.heureEntretien}
+                            value={item.heureEntretien}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
@@ -693,7 +798,7 @@ const Cloud = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
                             name="feedback"
-                            value={editFormData.feedback}
+                            value={item.feedback}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           >
@@ -707,7 +812,7 @@ const Cloud = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <textarea
                             name="commentaireRh"
-                            value={editFormData.commentaireRh}
+                            value={item.commentaireRh}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                             rows="2"
@@ -717,7 +822,7 @@ const Cloud = () => {
                           <input
                             type="text"
                             name="Recruteur"
-                            value={editFormData.Recruteur}
+                            value={item.Recruteur}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
@@ -727,7 +832,7 @@ const Cloud = () => {
                           <input
                             type="text" // Change to text for direct URL input during edit, or provide a separate file input
                             name="lienCV"
-                            value={editFormData.lienCV}
+                            value={item.lienCV}
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                             placeholder="Lien CV"
@@ -735,11 +840,11 @@ const Cloud = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
-                            type="text"
-                            name="lien_compteRendu"
-                            value={editFormData.lien_compteRendu}
-                            onChange={handleEditFormChange}
+                            type="file"
+                            name="compteRendu"
+                            onChange={handleCompteRenduFileChange}
                             className="border rounded px-2 py-1 w-full"
+                            accept=".pdf"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -781,7 +886,7 @@ const Cloud = () => {
                           {item.prenom}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {item.dateEntretien}
+                          {formatTimestampToDate(item.dateEntretien)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.heureEntretien}
@@ -833,16 +938,14 @@ const Cloud = () => {
                             >
                               <FaEdit size={16} />
                             </button>
-                              <button
-                                onClick={() => {
+                            <button
+                              onClick={() => {
                                 console.log("Item cliqué :", item); // Debug
                                 handleDelete(item._id); // Adaptez à votre clé
                               }}
                               className="text-red-600 hover:text-red-900..."
                             >
-
                               Supprimer
-
                               <FaTrashAlt size={16} />
                             </button>
                           </div>

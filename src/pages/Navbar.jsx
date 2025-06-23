@@ -2,9 +2,8 @@ import React from "react";
 import { FiBell, FiSearch, FiUser } from "react-icons/fi";
 
 const Navbar = () => {
-  const user = {name: "Mohamed", lastname: "sayah"};
-   
-  
+  const user = { name: "Mohamed", lastname: "sayah" };
+
   return (
     <div className="flex justify-between items-center bg-white/80 backdrop-blur-sm border-b border-rose-200 p-4 h-20 sticky top-0 z-10">
       {/* Logo/Titre */}
@@ -35,14 +34,16 @@ const Navbar = () => {
           <FiBell className="text-xl" />
           <span className="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full"></span>
         </button>
-        
+
         <div className="w-px h-8 bg-rose-200"></div>
-        
+
         <div className="flex items-center space-x-2">
           <div className="w-9 h-9 rounded-full bg-gradient-to-r from-rose-400 to-rose-600 flex items-center justify-center text-white">
             <FiUser className="text-lg" />
           </div>
-          <span className="text-rose-700 font-medium hidden md:block">{user.name}</span>
+          <span className="text-rose-700 font-medium hidden md:block">
+            {user.name}
+          </span>
         </div>
       </div>
     </div>

@@ -117,11 +117,28 @@ const AdminDb = () => {
       return () => {};
     }, [callBack]);
 
-  const handleDelete = (id) => {
-    const updatedCandidates = candidates.filter(candidate => candidate.id !== id);
-    setCandidates(updatedCandidates);
-  };
+  const handleDelete = async (id) => {
+  // Ajoutez cette vérification
+  if (!id) {
+    console.error("ID du candidat non défini");
+    alert("Impossible de supprimer : ID non défini");
+    return;
+  }
 
+  try {
+    const res = await instance.delete(`/candidates/${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+    
+    console.log("Candidate deleted:", res.data);
+    setCandidates(prev => prev.filter(c => c.id !== id));
+    
+  } catch (error) {
+    console.error("Erreur suppression:", error.response?.data?.message || error.message);
+    alert(error.response?.data?.message || "Erreur lors de la suppression");
+  }
+};
+//end
   const handleEditClick = (candidate) => {
     setEditingId(candidate.id);
     setEditFormData({

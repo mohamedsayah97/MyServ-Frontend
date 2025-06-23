@@ -11,9 +11,11 @@ const CompteCloud = () => {
     phone: '',
     drivingLicense: '',
     age: '',
+    profileImage: null, // Nouveau champ pour l'image
     status: '',
     diploma: '',
     experienceYears: '',
+    // exxxperienceMonths: '',
 
     // Section 2: Questions motivationnelles
     jobInterest: '',
@@ -49,6 +51,17 @@ const CompteCloud = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  // Gestionnaire pour le téléchargement d'image
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        profileImage: file
+      }));
+    }
   };
 
   // Gestionnaire de soumission du formulaire
@@ -112,13 +125,37 @@ const CompteCloud = () => {
             onChange={handleChange}
           />
           
-          <FormField 
-            label="Age"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            type="number"
-          />
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Age</label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Photo de profil</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+            </div>
+          </div>
           
           <FormField 
             label="Statut"
@@ -323,6 +360,13 @@ const CompteCloud = () => {
             value={formData.internationalClients}
             onChange={handleChange}
           />
+             {/* <FormField 
+            label="azertyuiopmlkjhgfdsqwx<cvbn"
+            name="exxxperienceMonths"
+            value={formData.exxxperienceMonths}
+            onChange={handleChange}
+            
+          /> */}
         </fieldset>
 
         <button 
