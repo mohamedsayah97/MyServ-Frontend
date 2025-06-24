@@ -57,6 +57,7 @@ const Cloud = () => {
     lien_compteRendu: "",
     compteRenduFile: null,
     cvFile: null,
+    specialite: "Cloud",
   });
   const [callBack, setCallBack] = useState(false);
 
@@ -683,6 +684,21 @@ const Cloud = () => {
                   rows="3"
                 />
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Spécialité
+                </label>
+                <input
+                  type="text"
+                  name="specialité"
+                  value={newCandidate.specialite}
+                  onChange={handleAddFormChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              
             </div>
             <div className="flex justify-end gap-3">
               <button
