@@ -26,7 +26,7 @@ const Cloud = () => {
     "Recruté",
   ];
 
-  const [editingId, setEditingId] = useState(null);
+  const [ editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({
     nom: "",
     prenom: "",
@@ -74,7 +74,8 @@ const Cloud = () => {
       candidate.commentaireRh?.toLowerCase().includes(searchLower) ||
       candidate.dateEntretien?.includes(searchTerm) ||
       candidate.heureEntretien?.includes(searchTerm) ||
-      candidate.id?.toString()?.includes(searchTerm)
+      candidate.id?.toString()?.includes(searchTerm)||
+      candidate.specialite?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -343,6 +344,8 @@ const Cloud = () => {
       lienCV: "",
       lien_compteRendu: "",
       cvFile: null,
+      // test
+      specialite: "Cloud",
     });
     setFileName("");
     setShowAddForm(false);
@@ -447,7 +450,14 @@ const Cloud = () => {
                     {selectedCandidate.commentaireRh}
                   </div>
                 </div>
-                
+                {/* <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Specialité
+                  </label>
+                  <div className="p-2 bg-gray-100 rounded">
+                    {selectedCandidate.specialite}
+                  </div>
+                </div> */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     CV
@@ -685,7 +695,7 @@ const Cloud = () => {
                 />
               </div>
               
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Spécialité
                 </label>
@@ -697,7 +707,7 @@ const Cloud = () => {
                   className="w-full border rounded px-3 py-2"
                   required
                 />
-              </div>
+              </div> */}
               
             </div>
             <div className="flex justify-end gap-3">
@@ -748,6 +758,9 @@ const Cloud = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Recruteur
                 </th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Spécialité
+                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   CV
                 </th>
@@ -783,6 +796,7 @@ const Cloud = () => {
                             onChange={handleEditFormChange}
                             className="border rounded px-2 py-1 w-full"
                           />
+                          {/*ici*/}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
@@ -913,6 +927,9 @@ const Cloud = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.commentaireRh}
                         </td>
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.specialite ? item.specialite : "Cloud"}
+                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.Recruteur}
                         </td>

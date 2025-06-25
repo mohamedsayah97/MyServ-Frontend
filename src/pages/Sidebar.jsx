@@ -246,7 +246,7 @@ const Sidebar = () => {
     { value: "cloud", label: "Ingénieur Système & Cloud", icon: <FiCloud className="text-rose-500" /> }
   ];
 
-  const userRole = localStorage.getItem("userRole") || "RH";
+  // const userRole = localStorage.getItem("userRole") || "RH";
 
   const handleNavigation = (path) => {
     setActiveItem(path);
@@ -289,7 +289,7 @@ const Sidebar = () => {
             {isExpanded && <span>Tableau de bord</span>}
           </button>
           {/* Seulement visible pour les admins */}
-        {userRole === "admin" && (
+        {/* {userRole === "admin" && ( */}
           <button
             onClick={() => handleNavigation("addrh")}
             className={`w-full flex items-center p-3 rounded-xl transition-all ${activeItem === "addrh" ? "bg-rose-200/70 text-rose-800" : "hover:bg-rose-100/50 text-rose-600"}`}
@@ -297,7 +297,7 @@ const Sidebar = () => {
             <FiUserPlus className={`text-lg ${isExpanded ? "mr-3" : "mx-auto"}`} />
             {isExpanded && <span>Ajouter RH</span>}
           </button>
-        )}
+        {/* )} */}
           <div className="relative">
             <button
               onClick={() => setShowTechDropdown(!showTechDropdown)}
@@ -326,7 +326,7 @@ const Sidebar = () => {
             )}
           </div>
             {/* Seulement visible pour les admins */}
-        {userRole === "admin" && (
+         {/* {userRole === "admin" && ( */}
           <button
             onClick={() => handleNavigation("suivirecruteur")}
             className={`w-full flex items-center p-3 rounded-xl transition-all ${activeItem === "suivirecruteur" ? "bg-rose-200/70 text-rose-800" : "hover:bg-rose-100/50 text-rose-600"}`}
@@ -334,7 +334,7 @@ const Sidebar = () => {
             <FiUsers className={`text-lg ${isExpanded ? "mr-3" : "mx-auto"}`} />
             {isExpanded && <span>Suivi Recruteur</span>}
           </button>
-         )}
+         {/* )} */}
           {/* <button
             onClick={() => handleNavigation("ajoutcandidat")}
             className={`w-full flex items-center p-3 rounded-xl transition-all ${activeItem === "ajoutcandidat" ? "bg-rose-200/70 text-rose-800" : "hover:bg-rose-100/50 text-rose-600"}`}
