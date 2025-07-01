@@ -89,9 +89,9 @@ const Cloud = () => {
         lien_compteRendu: URL.createObjectURL(file),
       });
     }
-  };
-  // recupérer la liste des candidats depuis l'API
-  useEffect(() => {
+   };
+   // recupérer la liste des candidats depuis l'API
+   useEffect(() => {
     const fetchCandidates = async () => {
       try {
         const token = localStorage.getItem("accessToken"); // Assuming you have a token stored in localStorage
