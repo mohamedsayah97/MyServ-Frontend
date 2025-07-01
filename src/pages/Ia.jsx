@@ -15,6 +15,16 @@ const Ia = () => {
       }
       fetchCandidate()
     }, [])
+
+    const deleteCandidate = async (id) => {
+      try {
+        await instance.delete(`/candidates/${id}`)
+        setCandidate(candidate.filter(cand => cand._id !== id))
+      } catch (error) {
+        console.error("Error deleting candidate:", error)
+      }
+    }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* <button className="mb-6 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-300">
@@ -63,7 +73,9 @@ const Ia = () => {
                 <button className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded text-sm">
                   Modifier
                 </button>
-                <button className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm">
+                <button 
+                onClick={() => deleteCandidate(cand._id)}
+                className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm">
                   Supprimer
                 </button>  
               </td>
