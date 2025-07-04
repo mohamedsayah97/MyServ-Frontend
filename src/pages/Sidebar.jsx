@@ -335,13 +335,13 @@ const Sidebar = () => {
             {isExpanded && <span>Suivi Recruteur</span>}
           </button>
          {/* )} */}
-          {/* <button
+          <button
             onClick={() => handleNavigation("ajoutcandidat")}
             className={`w-full flex items-center p-3 rounded-xl transition-all ${activeItem === "ajoutcandidat" ? "bg-rose-200/70 text-rose-800" : "hover:bg-rose-100/50 text-rose-600"}`}
           >
             <FiUserPlus className={`text-lg ${isExpanded ? "mr-3" : "mx-auto"}`} />
             {isExpanded && <span>Ajouter Candidat</span>}
-          </button> */}
+          </button>
         </nav>
 
         {/* Déconnexion */}

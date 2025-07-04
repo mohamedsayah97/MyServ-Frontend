@@ -45,13 +45,13 @@ function App() {
           <Route path="inteligence_artificiel" element={<Ia />} />
           <Route path="reseau" element={<Reseau />} />
           <Route path="cloud" element={<Cloud />} />
-          <Route path="compte_rendu_admin_db" element={<CompteDbAdmin />} />
-          <Route path="compte_rendu_reseau" element={<CompteReseau />} />
-          <Route path="compte_rendu_erp" element={<CompteErp />} />
-          <Route path="compte_rendu_full_stack" element={<CompteFull />} />
-          <Route path="compte_rendu_ia" element={<CompteIa />} />
-          <Route path="compte_rendu_analyste_cs" element={<CompteCS />} />
-          <Route path="compte_rendu_cloud" element={<CompteCloud />} />
+          <Route path="compte_rendu_admin_db/:id" element={<CompteDbAdmin />} />
+          <Route path="compte_rendu_reseau/:id" element={<CompteReseau />} />
+          <Route path="compte_rendu_erp/:id" element={<CompteErp />} />
+          <Route path="compte_rendu_full_stack/:id" element={<CompteFull />} />
+          <Route path="compte_rendu_ia/:id" element={<CompteIa />} />
+          <Route path="compte_rendu_analyste_cs/:id" element={<CompteCS />} />
+          <Route path="compte_rendu_cloud/:id" element={<CompteCloud />} />
           {/* <Route path="edit_candidat/:id" element={<EditCan />} />
           <Route path="view_candidat/:id" element={<ViewCan />} /> */}
         </Route>

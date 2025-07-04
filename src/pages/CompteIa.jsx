@@ -1,57 +1,11 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { useParams } from "react-router-dom";
+import { instance } from "../../config/axios";
 const CompteIa = () => {
+  const { id } = useParams();
   // État initial pour tous les champs du formulaire
-  const [formData, setFormData] = useState({
-    // Section 1: Informations personnelles
-    recruiter: '',
-    fullName: '',
-    address: '',
-    email: '',
-    phone: '',
-    drivingLicense: '',
-    age: '',
-    status: '',
-    diploma: '',
-    experienceYears: '',
-
-    // Section 2: Questions motivationnelles
-    jobInterest: '',
-    qualitiesDefects: '',
-    idealCandidate: '',
-    softSkills: '',
-    conflictManagement: '',
-    stressManagement: '',
-    positionInterest: '',
-    careerPlan: '',
-    moneyVsWork: '',
-    previousEmployer: '',
-    clientSituation: '',
-    
-    // Section 3: Formation et compétences
-    whyDataEngineering: '',
-    commonProblems: '',
-    scratchProject: '',
-    dataModeling: '',
-    structuredVsUnstructured: '',
-    bigDataDeployment: '',
-    hadoopFeatures: '',
-    dataVizTools: '',
-    etlTools: '',
-    nosqlVsRelational: '',
-    dataMiningVsAnalysis: '',
-    eda: '',
-    knnImputation: '',
-    modelIndicators: '',
-    descriptiveAnalysis: '',
-    predictiveAnalysis: '',
-    prescriptiveAnalysis: '',
-    dataValidation: '',
-    rVsPython: '',
-    analystTools: '',
-    workedDatabases: '',
-    workedOs: ''
-  });
+  const [formData, setFormData] = useState({});
+  const [reponse, setReponse] = useState({});
 
   // Gestionnaire de changement pour tous les champs
   const handleChange = (e) => {
@@ -62,6 +16,14 @@ const CompteIa = () => {
     }));
   };
 
+   const handleChangeReponse = (index, value) => {
+    setReponse((prev) => {
+      const newAnswers = [...prev];
+      newAnswers[index] = value;
+      return newAnswers;
+    });
+  };
+
   // Gestionnaire de soumission du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -69,6 +31,20 @@ const CompteIa = () => {
     // Ici vous pourriez ajouter la logique pour envoyer les données à un serveur
     alert('Formulaire soumis avec succès!');
   };
+
+   const getCandidat = async () => {
+    try {
+      const response = await instance.get(`/candidates/${id}`);
+      console.log(response.data.data);
+      console.log(response.data);
+      setFormData(response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    getCandidat();
+  }, []);
 
   return (
     <div className="compte-rendu-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
@@ -81,45 +57,45 @@ const CompteIa = () => {
           
           <FormField 
             label="Recruteur"
-            name="recruiter"
-            value={formData.recruiter}
+            name="recruteur"
+            value={formData.recruteur ? (formData.recruteur.nom || '') + ' ' + (formData.recruteur.prenom || '') : ''}
             onChange={handleChange}
           />
           
           <FormField 
             label="Nom & Prénom"
             name="fullName"
-            value={formData.fullName}
+            value={formData.nom + ' ' + formData.prenom}
             onChange={handleChange}
           />
           
           <FormField 
             label="Adresse"
-            name="address"
-            value={formData.address}
+            name="adresse"
+            value={formData.adresse}
             onChange={handleChange}
           />
           
           <FormField 
             label="Adresse mail"
-            name="email"
-            value={formData.email}
+            name="mail"
+            value={formData.mail}
             onChange={handleChange}
             type="email"
           />
           
           <FormField 
             label="Numero Tel"
-            name="phone"
-            value={formData.phone}
+            name="telephone"
+            value={formData.telephone}
             onChange={handleChange}
             type="tel"
           />
           
           <FormField 
             label="Permis de Conduire"
-            name="drivingLicense"
-            value={formData.drivingLicense}
+            name="permis_conduire"
+            value={formData.permis_conduire}
             onChange={handleChange}
           />
           
@@ -133,22 +109,22 @@ const CompteIa = () => {
           
           <FormField 
             label="Statut"
-            name="status"
-            value={formData.status}
+            name="statut"
+            value={formData.statut}
             onChange={handleChange}
           />
           
           <FormField 
             label="Diplome"
-            name="diploma"
-            value={formData.diploma}
+            name="diplome"
+            value={formData.diplome}
             onChange={handleChange}
           />
           
           <FormField 
             label="Année d'expérience"
-            name="experienceYears"
-            value={formData.experienceYears}
+            name="experience"
+            value={formData.experience}
             onChange={handleChange}
             type="number"
           />
@@ -161,88 +137,88 @@ const CompteIa = () => {
           <FormField 
             label="Why are you interested in our job offer:"
             name="jobInterest"
-            value={formData.jobInterest}
-            onChange={handleChange}
+            value={reponse[0]}
+            onChange={(e) => handleChangeReponse(0, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quels sont vos Qualités / Défauts ? (défauts: pistes d'amélioration actuelles)"
             name="qualitiesDefects"
-            value={formData.qualitiesDefects}
-            onChange={handleChange}
+            value={reponse[1]}
+            onChange={(e) => handleChangeReponse(1, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Pourquoi êtes-vous le candidat idéal pour ce poste ?"
             name="idealCandidate"
-            value={formData.idealCandidate}
-            onChange={handleChange}
+            value={reponse[2]}
+            onChange={(e) => handleChangeReponse(2, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Selon vous, quelles sont les compétences non techniques nécessaires dans le monde professionnel ? (Soft skills/ facteurs humains)"
             name="softSkills"
-            value={formData.softSkills}
-            onChange={handleChange}
+            value={reponse[3]}
+            onChange={(e) => handleChangeReponse(3, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Comment gérez-vous un conflit au travail ?"
             name="conflictManagement"
-            value={formData.conflictManagement}
-            onChange={handleChange}
+            value={reponse[4]}
+            onChange={(e) => handleChangeReponse(4, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Comment gérez-vous une situation de stress ?"
             name="stressManagement"
-            value={formData.stressManagement}
-            onChange={handleChange}
+            value={reponse[5]}
+            onChange={(e) => handleChangeReponse(5, e.target.value)}
             textarea
           />
           
           <FormField 
             label="En quoi ce poste vous intéresse-t-il ? Qu'attendez-vous de ce poste ? Pourquoi êtes-vous à l'écoute du marché? Pourquoi en France exactement ?"
             name="positionInterest"
-            value={formData.positionInterest}
-            onChange={handleChange}
+            value={reponse[6]}
+            onChange={(e) => handleChangeReponse(6, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Comment envisagez-vous votre carrière? (Où vous voyez-vous dans cinq ans?)"
             name="careerPlan"
-            value={formData.careerPlan}
-            onChange={handleChange}
+            value={reponse[7]}
+            onChange={(e) => handleChangeReponse(7, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Entre l'argent et le travail lequel vous semble le plus important ?"
             name="moneyVsWork"
-            value={formData.moneyVsWork}
-            onChange={handleChange}
+            value={reponse[8]}
+            onChange={(e) => handleChangeReponse(8, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Parlez-moi de votre ancien employeur? (emploi actuel)"
             name="previousEmployer"
-            value={formData.previousEmployer}
-            onChange={handleChange}
+            value={reponse[9]}
+            onChange={(e) => handleChangeReponse(9, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Si vous êtes face à une situation où un client vous demande un travail dans une courte période et vous savez que c'est impossible de faire délivrer le travail à la date prédéfinie, comment gérez-vous la situation ?"
             name="clientSituation"
-            value={formData.clientSituation}
-            onChange={handleChange}
+            value={reponse[10]}
+            onChange={(e) => handleChangeReponse(10, e.target.value)}
             textarea
           />
         </fieldset>
@@ -254,173 +230,173 @@ const CompteIa = () => {
           <FormField 
             label="Pourquoi avez-vous étudié l'ingénierie des données ?"
             name="whyDataEngineering"
-            value={formData.whyDataEngineering}
-            onChange={handleChange}
+            value={reponse[11]}
+            onChange={(e) => handleChangeReponse(11, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quels sont les problèmes courants auxquels vous avez été confrontés en tant qu'ingénieur de données ?"
             name="commonProblems"
-            value={formData.commonProblems}
-            onChange={handleChange}
+            value={reponse[12]}
+            onChange={(e) => handleChangeReponse(12, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Avez-vous travaillé sur un projet from scratch (un projet qui a commencé de 0) ? Détails sur ce projet, technologies utilisées, taille d'équipe, méthodes de travail ?"
             name="scratchProject"
-            value={formData.scratchProject}
-            onChange={handleChange}
+            value={reponse[13]}
+            onChange={(e) => handleChangeReponse(13, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Qu'est-ce que la modélisation des données ?"
             name="dataModeling"
-            value={formData.dataModeling}
-            onChange={handleChange}
+            value={reponse[14]}
+            onChange={(e) => handleChangeReponse(14, e.target.value)}
             textarea
           />
           
           <FormField 
             label="La différence entre les données structurées et les données non structurées ?"
             name="structuredVsUnstructured"
-            value={formData.structuredVsUnstructured}
-            onChange={handleChange}
+            value={reponse[15]}
+            onChange={(e) => handleChangeReponse(15, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Lors du déploiement d'une solution Big Data, quelles étapes devez-vous suivre ?"
             name="bigDataDeployment"
-            value={formData.bigDataDeployment}
-            onChange={handleChange}
+            value={reponse[16]}
+            onChange={(e) => handleChangeReponse(16, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quelle est la différence entre NAS et DAS dans le cluster Hadoop ? Fonctionnalités importantes de Hadoop ?"
             name="hadoopFeatures"
-            value={formData.hadoopFeatures}
-            onChange={handleChange}
+            value={reponse[17]}
+            onChange={(e) => handleChangeReponse(17, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Maitrisez-vous au moins un outil de Data Visualisation ?"
             name="dataVizTools"
-            value={formData.dataVizTools}
-            onChange={handleChange}
+            value={reponse[18]}
+            onChange={(e) => handleChangeReponse(18, e.target.value)}
           />
           
           <FormField 
             label="Avec quels outils ETL avez-vous travaillé ? Quelle est votre préférée, et pourquoi ?"
             name="etlTools"
-            value={formData.etlTools}
-            onChange={handleChange}
+            value={reponse[19]}
+            onChange={(e) => handleChangeReponse(19, e.target.value)}
             textarea
           />
           
           <FormField 
             label="La construction d'une base de données NoSQL est-elle meilleure que la construction d'une base de données relationnelle ?"
             name="nosqlVsRelational"
-            value={formData.nosqlVsRelational}
-            onChange={handleChange}
+            value={reponse[20]}
+            onChange={(e) => handleChangeReponse(20, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quelle est la différence entre le data mining et data analysis ?"
             name="dataMiningVsAnalysis"
-            value={formData.dataMiningVsAnalysis}
-            onChange={handleChange}
+            value={reponse[21]}
+            onChange={(e) => handleChangeReponse(21, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Exploratory Data Analysis (EDA) - Qu'est-ce que c'est ?"
             name="eda"
-            value={formData.eda}
-            onChange={handleChange}
+            value={reponse[22]}
+            onChange={(e) => handleChangeReponse(22, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Expliquer la méthode d'imputation KNN (nearest neighbor imputation)"
             name="knnImputation"
-            value={formData.knnImputation}
-            onChange={handleChange}
+            value={reponse[23]}
+            onChange={(e) => handleChangeReponse(23, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Citer quelques indicateurs qui assurent que le modèle de données est bon ?"
             name="modelIndicators"
-            value={formData.modelIndicators}
-            onChange={handleChange}
+            value={reponse[24]}
+            onChange={(e) => handleChangeReponse(24, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Qu'est-ce que l'analyse descriptive ?"
             name="descriptiveAnalysis"
-            value={formData.descriptiveAnalysis}
-            onChange={handleChange}
+            value={reponse[25]}
+            onChange={(e) => handleChangeReponse(25, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Qu'est-ce que l'analyse prédictive ?"
             name="predictiveAnalysis"
-            value={formData.predictiveAnalysis}
-            onChange={handleChange}
+            value={reponse[26]}
+            onChange={(e) => handleChangeReponse(26, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Qu'est-ce que l'analyse prescriptive ?"
             name="prescriptiveAnalysis"
-            value={formData.prescriptiveAnalysis}
-            onChange={handleChange}
+            value={reponse[27]}
+            onChange={(e) => handleChangeReponse(27, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quelles sont les principales étapes de validation des données ?"
             name="dataValidation"
-            value={formData.dataValidation}
-            onChange={handleChange}
+            value={reponse[28]}
+            onChange={(e) => handleChangeReponse(28, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Entre R et Python, lequel choisiriez-vous pour l'analyse de texte ? (Python)"
             name="rVsPython"
-            value={formData.rVsPython}
-            onChange={handleChange}
+            value={reponse[29]}
+            onChange={(e) => handleChangeReponse(29, e.target.value)}
           />
           
           <FormField 
             label="De façon générale, quels sont les outils que vous maitrisez comme un data analyst ?"
             name="analystTools"
-            value={formData.analystTools}
-            onChange={handleChange}
+            value={reponse[30]}
+            onChange={(e) => handleChangeReponse(30, e.target.value)}
             textarea
           />
           
           <FormField 
             label="Quelles sont les bases de données que vous avez utilisées ?"
             name="workedDatabases"
-            value={formData.workedDatabases}
-            onChange={handleChange}
+            value={reponse[31]}
+            onChange={(e) => handleChangeReponse(31, e.target.value)}
           />
           
           <FormField 
             label="Quels sont les systèmes d'exploitation que vous avez utilisés ?"
             name="workedOs"
-            value={formData.workedOs}
-            onChange={handleChange}
+            value={reponse[32]}
+            onChange={(e) => handleChangeReponse(32, e.target.value)}
           />
         </fieldset>
 

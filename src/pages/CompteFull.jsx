@@ -1,86 +1,56 @@
-import { useState } from "react";
-import React  from "react";
-
+import { useEffect, useState } from "react";
+import React from "react";
+import { useParams } from "react-router-dom";
+import { instance } from "../../config/axios";
 
 const CompteFull = () => {
-  // Données du candidat par défaut
-  const defaultCandidate = {
-    recruiter: "",
-    fullName: "Jean Dupont",
-    address: "123 Rue de Paris, 75001 Paris, France",
-    email: "jean.dupont@example.com",
-    phone: "+33 6 12 34 56 78",
-    drivingLicense: "B",
-    age: "32",
-    status: "Disponible immédiatement",
-    diploma: "Master en Informatique",
-    experience: "",
-    desiredSalary: "",
-    noticePeriod: "",
-    visa: "",
-    mobility: "",
-    otherCompany: "",
-    languageLevel: "",
-    interestReason: "",
-    qualitiesDefects: "",
-    idealCandidate: "",
-    softSkills: "",
-    conflictManagement: "",
-    stressManagement: "",
-    positionInterest: "",
-    careerVision: "",
-    moneyVsWork: "",
-    previousEmployer: "",
-    clientSituation: "",
-    fullStackMissions: "",
-    frontBackTech: "",
-    responsiveAdaptive: "",
-    webMobileDiff: "",
-    technicalProblems: "",
-    workMethods: "",
-    databases: "",
-    operatingSystems: "",
-    reactCreator: "",
-    reactFeatures: "",
-    scratchProject: "",
-    usedTechnologies: "",
-    teamSize: "",
-    projectMethods: "",
-    unitFunctionalTest: "",
-    internationalClients: ""
-  };
-
-  const [formData, setFormData] = useState(defaultCandidate);
-
+  const { id } = useParams();
+  const [formData, setFormData] = useState();
+  const [reponse, setReponse] = useState({});
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  const handleChangeReponse = (index, value) => {
+    setReponse((prev) => {
+      const newAnswers = [...prev];
+      newAnswers[index] = value;
+      return newAnswers;
+    });
+  };
+ 
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-center mb-8 text-blue-700">Compte-Rendu Développeur Full-Stack</h1>
-      
+      <h1 className="text-3xl font-bold text-center mb-8 text-blue-700">
+        Compte-Rendu Développeur Full-Stack
+      </h1>
+
       <div className="space-y-6">
         {/* Informations de base */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-lg">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Recruteur</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Recruteur
+              </label>
               <input
                 type="text"
-                name="recruiter"
-                value={formData.recruiter}
+                name="recruteur"
+                value={formData.recruteur}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nom & Prénom</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nom & Prénom
+              </label>
               <input
                 type="text"
                 name="fullName"
@@ -90,9 +60,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Adresse
+              </label>
               <input
                 type="text"
                 name="address"
@@ -102,9 +74,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Adresse mail</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Adresse mail
+              </label>
               <input
                 type="text"
                 name="email"
@@ -114,9 +88,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Numero Tel</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Numero Tel
+              </label>
               <input
                 type="text"
                 name="phone"
@@ -127,10 +103,12 @@ const CompteFull = () => {
               />
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Permis de Conduire</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Permis de Conduire
+              </label>
               <input
                 type="text"
                 name="drivingLicense"
@@ -140,9 +118,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Age
+              </label>
               <input
                 type="text"
                 name="age"
@@ -152,9 +132,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Statut
+              </label>
               <input
                 type="text"
                 name="status"
@@ -164,9 +146,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Diplome</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Diplome
+              </label>
               <input
                 type="text"
                 name="diploma"
@@ -176,9 +160,11 @@ const CompteFull = () => {
                 readOnly
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Année d'expérience</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Année d'expérience
+              </label>
               <input
                 type="text"
                 name="experience"
@@ -199,8 +185,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="interestReason"
-              value={formData.interestReason}
-              onChange={handleChange}
+              value={reponse[0]}
+              onChange={(e) => handleChangeReponse(0, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -209,12 +195,13 @@ const CompteFull = () => {
           {/* Question 2 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quels sont vos Qualités / Défauts ? (défauts: pistes d'amélioration actuelles)
+              Quels sont vos Qualités / Défauts ? (défauts: pistes
+              d'amélioration actuelles)
             </label>
             <textarea
               name="qualitiesDefects"
-              value={formData.qualitiesDefects}
-              onChange={handleChange}
+              value={reponse[1]}
+              onChange={(e) => handleChangeReponse(1, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -227,8 +214,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="idealCandidate"
-              value={formData.idealCandidate}
-              onChange={handleChange}
+              value={reponse[2]}
+              onChange={(e) => handleChangeReponse(2, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -237,13 +224,14 @@ const CompteFull = () => {
           {/* Question 4 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Selon vous, quelles sont les compétences non techniques nécessaires
-              dans le monde professionnel ? (Soft skills/ facteurs humains)
+              Selon vous, quelles sont les compétences non techniques
+              nécessaires dans le monde professionnel ? (Soft skills/ facteurs
+              humains)
             </label>
             <textarea
               name="softSkills"
-              value={formData.softSkills}
-              onChange={handleChange}
+              value={reponse[3]}
+              onChange={(e) => handleChangeReponse(3, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -256,8 +244,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="conflictManagement"
-              value={formData.conflictManagement}
-              onChange={handleChange}
+              value={reponse[4]}
+              onChange={(e) => handleChangeReponse(4, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -270,8 +258,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="stressManagement"
-              value={formData.stressManagement}
-              onChange={handleChange}
+              value={reponse[5]}
+              onChange={(e) => handleChangeReponse(5, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -280,14 +268,14 @@ const CompteFull = () => {
           {/* Question 7 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              En quoi ce poste vous intéresse t-il ? Qu'est-ce que vous attendez de
-              ce poste ? Pourquoi etes-vous a l'écoute du marché? Pourquoi en France
-              exactement ?
+              En quoi ce poste vous intéresse t-il ? Qu'est-ce que vous attendez
+              de ce poste ? Pourquoi etes-vous a l'écoute du marché? Pourquoi en
+              France exactement ?
             </label>
             <textarea
               name="positionInterest"
-              value={formData.positionInterest}
-              onChange={handleChange}
+              value={reponse[6]}
+              onChange={(e) => handleChangeReponse(6, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="4"
             />
@@ -296,12 +284,13 @@ const CompteFull = () => {
           {/* Question 8 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Comment envisagez-vous votre carrière? (Ou vous voyez-vous dans cinq ans?)
+              Comment envisagez-vous votre carrière? (Ou vous voyez-vous dans
+              cinq ans?)
             </label>
             <textarea
               name="careerVision"
-              value={formData.careerVision}
-              onChange={handleChange}
+              value={reponse[7]}
+              onChange={(e) => handleChangeReponse(7, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -310,12 +299,13 @@ const CompteFull = () => {
           {/* Question 9 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Entre l'argent et le travail lequel vous semble le plus important ?
+              Entre l'argent et le travail lequel vous semble le plus important
+              ?
             </label>
             <textarea
               name="moneyVsWork"
-              value={formData.moneyVsWork}
-              onChange={handleChange}
+              value={reponse[8]}
+              onChange={(e) => handleChangeReponse(8, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -328,8 +318,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="previousEmployer"
-              value={formData.previousEmployer}
-              onChange={handleChange}
+              value={reponse[9]}
+              onChange={(e) => handleChangeReponse(9, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -338,15 +328,15 @@ const CompteFull = () => {
           {/* Question 11 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Si vous etes face à une situation ou un client vous demande un travail
-              dans une courte période et vous savez que c'est impossible de faire
-              délivrer le travail à la date prédéfinie comment gérer vous la
-              situation ?
+              Si vous etes face à une situation ou un client vous demande un
+              travail dans une courte période et vous savez que c'est impossible
+              de faire délivrer le travail à la date prédéfinie comment gérer
+              vous la situation ?
             </label>
             <textarea
               name="clientSituation"
-              value={formData.clientSituation}
-              onChange={handleChange}
+              value={reponse[10]}
+              onChange={(e) => handleChangeReponse(10, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="4"
             />
@@ -355,12 +345,13 @@ const CompteFull = () => {
           {/* Question 12 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quelles sont les missions principales d'un développeur web full stack
+              Quelles sont les missions principales d'un développeur web full
+              stack
             </label>
             <textarea
               name="fullStackMissions"
-              value={formData.fullStackMissions}
-              onChange={handleChange}
+              value={reponse[11]}
+              onChange={(e) => handleChangeReponse(11, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -369,14 +360,14 @@ const CompteFull = () => {
           {/* Question 13 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quelles sont les technologies de developpeur front et back ? 
-              1. Quels outils utilisez-vous pour le développement front-end ? 
-              2. Quels outils utilisez-vous pour le développement back-end ?
+              Quelles sont les technologies de developpeur front et back ? 1.
+              Quels outils utilisez-vous pour le développement front-end ? 2.
+              Quels outils utilisez-vous pour le développement back-end ?
             </label>
             <textarea
               name="frontBackTech"
-              value={formData.frontBackTech}
-              onChange={handleChange}
+              value={reponse[12]}
+              onChange={(e) => handleChangeReponse(12, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="4"
             />
@@ -385,12 +376,13 @@ const CompteFull = () => {
           {/* Question 14 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quel est la différence entre : Un Responsive design Et Un Adaptive design
+              Quel est la différence entre : Un Responsive design Et Un Adaptive
+              design
             </label>
             <textarea
               name="responsiveAdaptive"
-              value={formData.responsiveAdaptive}
-              onChange={handleChange}
+              value={reponse[13]}
+              onChange={(e) => handleChangeReponse(13, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -399,12 +391,13 @@ const CompteFull = () => {
           {/* Question 15 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quels sont les principales différences entre le développement Web et Mobile ?
+              Quels sont les principales différences entre le développement Web
+              et Mobile ?
             </label>
             <textarea
               name="webMobileDiff"
-              value={formData.webMobileDiff}
-              onChange={handleChange}
+              value={reponse[14]}
+              onChange={(e) => handleChangeReponse(14, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -413,12 +406,13 @@ const CompteFull = () => {
           {/* Question 16 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quels étaient les problèmes techniques les plus difficiles que vous rencontrés ?
+              Quels étaient les problèmes techniques les plus difficiles que
+              vous rencontrés ?
             </label>
             <textarea
               name="technicalProblems"
-              value={formData.technicalProblems}
-              onChange={handleChange}
+              value={reponse[15]}
+              onChange={(e) => handleChangeReponse(15, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -431,8 +425,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="workMethods"
-              value={formData.workMethods}
-              onChange={handleChange}
+              value={reponse[16]}
+              onChange={(e) => handleChangeReponse(16, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -445,8 +439,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="databases"
-              value={formData.databases}
-              onChange={handleChange}
+              value={reponse[17]}
+              onChange={(e) => handleChangeReponse(17, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -455,12 +449,13 @@ const CompteFull = () => {
           {/* Question 19 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quels sont les systèmes d'exploitation que vous avez travaillé sur ?
+              Quels sont les systèmes d'exploitation que vous avez travaillé sur
+              ?
             </label>
             <textarea
               name="operatingSystems"
-              value={formData.operatingSystems}
-              onChange={handleChange}
+              value={reponse[18]}
+              onChange={(e) => handleChangeReponse(18, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -469,13 +464,13 @@ const CompteFull = () => {
           {/* Question 20 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Qui a développé React.js ? (React.js est un framework JavaScript open
-              source développé par Facebook)
+              Qui a développé React.js ? (React.js est un framework JavaScript
+              open source développé par Facebook)
             </label>
             <textarea
               name="reactCreator"
-              value={formData.reactCreator}
-              onChange={handleChange}
+              value={reponse[19]}
+              onChange={(e) => handleChangeReponse(19, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -488,8 +483,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="reactFeatures"
-              value={formData.reactFeatures}
-              onChange={handleChange}
+              value={reponse[20]}
+              onChange={(e) => handleChangeReponse(20, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -498,13 +493,14 @@ const CompteFull = () => {
           {/* Question 22 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Est ce que vous avez travaillé sur un projet from scratch 
-              (un projet qui a commencé de 0) : Pouvez-vous me donner plus de détails sur ce projet ?
+              Est ce que vous avez travaillé sur un projet from scratch (un
+              projet qui a commencé de 0) : Pouvez-vous me donner plus de
+              détails sur ce projet ?
             </label>
             <textarea
               name="scratchProject"
-              value={formData.scratchProject}
-              onChange={handleChange}
+              value={reponse[21]}
+              onChange={(e) => handleChangeReponse(21, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="4"
             />
@@ -517,8 +513,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="usedTechnologies"
-              value={formData.usedTechnologies}
-              onChange={handleChange}
+              value={reponse[22]}
+              onChange={(e) => handleChangeReponse(22, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -531,8 +527,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="teamSize"
-              value={formData.teamSize}
-              onChange={handleChange}
+              value={reponse[23]}
+              onChange={(e) => handleChangeReponse(23, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -545,8 +541,8 @@ const CompteFull = () => {
             </label>
             <textarea
               name="projectMethods"
-              value={formData.projectMethods}
-              onChange={handleChange}
+              value={reponse[24]}
+              onChange={(e) => handleChangeReponse(24, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -555,12 +551,13 @@ const CompteFull = () => {
           {/* Question 26 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Quelle est la différence entre un test unitaire et un test fonctionnel ?
+              Quelle est la différence entre un test unitaire et un test
+              fonctionnel ?
             </label>
             <textarea
               name="unitFunctionalTest"
-              value={formData.unitFunctionalTest}
-              onChange={handleChange}
+              value={reponse[25]}
+              onChange={(e) => handleChangeReponse(25, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
@@ -569,18 +566,20 @@ const CompteFull = () => {
           {/* Question 27 */}
           <div className="p-6 bg-white rounded-lg shadow">
             <label className="block text-lg font-medium text-gray-800 mb-3">
-              Avez-vous une expérience de travail avec des clients internationaux ?
+              Avez-vous une expérience de travail avec des clients
+              internationaux ?
             </label>
             <textarea
               name="internationalClients"
-              value={formData.internationalClients}
-              onChange={handleChange}
+              value={reponse[26]}
+              onChange={(e) => handleChangeReponse(26, e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="3"
             />
           </div>
         </div>
       </div>
+      {/* <button></button> */}
     </div>
   );
 };
