@@ -143,6 +143,7 @@ const Ia = () => {
             </tr>
           </thead>
           <tbody>
+
             {filteredCandidates.length > 0 ? (
               filteredCandidates.map((cand) => {
                 const isEditing = editingId === cand._id
@@ -274,6 +275,7 @@ const Ia = () => {
           </tbody>
         </table>
       </div>
+      
     </div>
   )
 }

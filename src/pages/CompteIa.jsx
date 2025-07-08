@@ -6,7 +6,7 @@ const CompteIa = () => {
   // État initial pour tous les champs du formulaire
   const [formData, setFormData] = useState({});
   const [reponse, setReponse] = useState({});
-
+  const [fileData, setFileData] = useState(null);
   // Gestionnaire de changement pour tous les champs
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,7 +15,19 @@ const CompteIa = () => {
       [name]: value
     }));
   };
-
+  // Gestionnaire pour le téléchargement d'image
+  // const handleImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       profileImage: file
+  //     }));
+  //   }
+  // };
+  const fileChangeHandler = (e) => {
+    setFileData(e.target.files[0]);
+  };
    const handleChangeReponse = (index, value) => {
     setReponse((prev) => {
       const newAnswers = [...prev];
@@ -27,9 +39,23 @@ const CompteIa = () => {
   // Gestionnaire de soumission du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Formulaire soumis:', formData);
-    // Ici vous pourriez ajouter la logique pour envoyer les données à un serveur
-    alert('Formulaire soumis avec succès!');
+
+    const data = new FormData();
+    data.append('image', fileData())
+    fetch("http://localhost:5000/upload", {
+      method: "POST",
+      body: data,
+    })
+    .then((result) => {
+      console.log("file sent successfully", result);
+    })
+    .catch((error) => {
+      console.error("Error uploading file:", error);
+    });
+
+    // console.log('Formulaire soumis:', formData);
+    // // Ici vous pourriez ajouter la logique pour envoyer les données à un serveur
+    // alert('Formulaire soumis avec succès!');
   };
 
    const getCandidat = async () => {
@@ -60,6 +86,7 @@ const CompteIa = () => {
             name="recruteur"
             value={formData.recruteur ? (formData.recruteur.nom || '') + ' ' + (formData.recruteur.prenom || '') : ''}
             onChange={handleChange}
+            readOnly            
           />
           
           <FormField 
@@ -67,6 +94,7 @@ const CompteIa = () => {
             name="fullName"
             value={formData.nom + ' ' + formData.prenom}
             onChange={handleChange}
+            readOnly            
           />
           
           <FormField 
@@ -83,6 +111,21 @@ const CompteIa = () => {
             onChange={handleChange}
             type="email"
           />
+          <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Photo de profil</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={fileChangeHandler}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+             </div>
+          
           
           <FormField 
             label="Numero Tel"

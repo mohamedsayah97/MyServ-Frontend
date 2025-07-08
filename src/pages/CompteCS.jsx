@@ -1,49 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 
 const CompteCS = () => {
-  // Données du candidat par défaut
-  const defaultCandidate = {
-    recruiter: "",
-    fullName: "Marie Lambert",
-    address: "456 Avenue de la Sécurité, 69002 Lyon, France",
-    email: "marie.lambert@example.com",
-    phone: "+33 6 98 76 54 32",
-    drivingLicense: "B",
-    age: "28",
-    status: "Disponible sous 1 mois",
-    diploma: "Master en Cybersécurité",
-    experience: "",
-    whyListening: "",
-    qualitiesDefects: "",
-    idealCandidate: "",
-    careerVision: "",
-    whySecurityAnalysts: "",
-    securityTools: "",
-    attackSituation: "",
-    compliance: "",
-    idsIpsDiff: "",
-    vpnSslIpsec: "",
-    vulnerabilityScanners: "",
-    antivirus: "",
-    securitySolutions: "",
-    technicalSupport: "",
-    internationalClients: ""
-  };
+ 
 
-  const [formData, setFormData] = React.useState(defaultCandidate);
 
+  const [formData, setFormData] = useState({});
+  const [fileData, setFileData] = useState(null);
+  const [reponse, setReponse] = useState({});
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target.value;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-
+  const fileChangeHandler = (e) => {
+    setFileData(e.target.files[0]);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault()
+  }
+  const handleChangeReponse = (index, value) => {
+    setReponse((prev) => {
+      const newAnswers = [...prev];
+      newAnswers[index] = value;
+      return newAnswers;
+    });
+  };
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8 text-blue-700">Compte-Rendu Analyste en Cybersécurité</h1>
-      
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg">
       <div className="space-y-6">
         {/* Informations de base */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-lg">
@@ -67,7 +54,7 @@ const CompteCS = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
               />
             </div>
             
@@ -79,7 +66,7 @@ const CompteCS = () => {
                 value={formData.address}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
               />
             </div>
             
@@ -91,7 +78,7 @@ const CompteCS = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
               />
             </div>
           </div>
@@ -105,7 +92,7 @@ const CompteCS = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
               />
             </div>
             
@@ -117,7 +104,7 @@ const CompteCS = () => {
                 value={formData.drivingLicense}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+               
               />
             </div>
             
@@ -129,7 +116,7 @@ const CompteCS = () => {
                 value={formData.age}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+               
               />
             </div>
             
@@ -141,7 +128,19 @@ const CompteCS = () => {
                 value={formData.status}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Image du candidat</label>
+              <input
+                type="file"
+                name="imageCandidat"
+                accept="image/*"
+                value={formData.imageCandidat}
+                onChange={fileChangeHandler}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                
               />
             </div>
             
@@ -153,7 +152,7 @@ const CompteCS = () => {
                 value={formData.diploma}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                
               />
             </div>
           </div>
@@ -167,8 +166,9 @@ const CompteCS = () => {
             <input
               type="text"
               name="experience"
-              value={formData.experience}
-              onChange={handleChange}
+              value={reponse[0]}
+               onChange={(e) => handleChangeReponse(0, e.target.value)}
+               textarea
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -384,6 +384,7 @@ const CompteCS = () => {
           </div>
         </div>
       </div>
+      </form>
     </div>
   );
 };
