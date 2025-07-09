@@ -172,7 +172,7 @@ const Cloud = () => {
   //     console.error("Erreur :", error.response?.data);
   //   }
   // };
-  const handleEditClick = (candidate) => {
+ const handleEditClick = (candidate) => {
     setEditingId(candidate.id);
     setEditFormData({
       nom: candidate.nom,
@@ -182,8 +182,8 @@ const Cloud = () => {
       feedback: candidate.feedback,
       commentaireRh: candidate.commentaireRh,
       Recruteur: candidate.Recruteur,
-      lienCV: candidate.lienCV,
-      lien_compteRendu: candidate.lien_compteRendu,
+      compteRenduUrl: candidate.compteRenduUrl,
+      cvUrl: candidate.cvUrl
     });
   };
 

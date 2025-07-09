@@ -80,13 +80,14 @@ const Ia = () => {
     }
   }
 
+  // Filtre combiné pour spécialité IA et recherche
   const filteredCandidates = candidates.filter(cand => {
-    const nom = cand.nom || ''
-    const prenom = cand.prenom || ''
-    return (
-      nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      prenom.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const isIA = cand.Spéciality === 'IA' // Vérifie la spécialité IA
+    const matchesSearch = 
+      (cand.nom || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (cand.prenom || '').toLowerCase().includes(searchTerm.toLowerCase())
+    
+    return isIA && matchesSearch
   })
 
   if (loading) {
@@ -118,7 +119,7 @@ const Ia = () => {
           </div>
           <input
             type="text"
-            placeholder="Rechercher un candidat..."
+            placeholder="Rechercher un candidat IA..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -135,15 +136,12 @@ const Ia = () => {
               <th className="py-3 px-4 border-b font-semibold text-left">Date Entretien</th>
               <th className="py-3 px-4 border-b font-semibold text-left">Heure</th>
               <th className="py-3 px-4 border-b font-semibold text-left">Statut</th>
-              {/* <th className="py-3 px-4 border-b font-semibold text-left">CV</th>
-              <th className="py-3 px-4 border-b font-semibold text-left">Compte Rendu</th> */}
               <th className="py-3 px-4 border-b font-semibold text-left">Commentaire RH</th>
               <th className="py-3 px-4 border-b font-semibold text-left">Actions</th>
-              <th className='py-3 px-4 border-b font-semibold text-left'>Question</th>
+              <th className="py-3 px-4 border-b font-semibold text-left">Question</th>
             </tr>
           </thead>
           <tbody>
-
             {filteredCandidates.length > 0 ? (
               filteredCandidates.map((cand) => {
                 const isEditing = editingId === cand._id
@@ -260,22 +258,28 @@ const Ia = () => {
                       )}
                     </td>
                     <td className="py-3 px-4 border-b">
-                      <Link to={`/dashboard/compte_rendu_ia/${cand._id}`}>Click</Link>
+                      <Link 
+                        to={`/dashboard/compte_rendu_ia/${cand._id}`}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Voir
+                      </Link>
                     </td>
                   </tr>
                 )
               })
             ) : (
               <tr>
-                <td colSpan="7" className="py-4 text-center text-gray-500">
-                  Aucun candidat trouvé
+                <td colSpan="8" className="py-4 text-center text-gray-500">
+                  {searchTerm ? 
+                    "Aucun candidat IA ne correspond à votre recherche" : 
+                    "Aucun candidat IA trouvé"}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-      
     </div>
   )
 }

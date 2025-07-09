@@ -77,7 +77,9 @@ const Ajoutcand = () => {
           if (formData.Spéciality=== 'IA') {
             window.location.href = '/dashboard/inteligence_artificiel';
           }
-          
+           if (formData.Spéciality=== 'Consultant SAP') {
+            window.location.href = '/dashboard/erp';
+          }
 
    } catch (error) {
      console.error('Erreur lors de l\'ajout du candidat:', error)

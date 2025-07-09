@@ -88,12 +88,12 @@ const Erp = () => {
   }
 
   const filteredCandidates = candidates.filter(cand => {
-    const nom = cand.nom || ''
-    const prenom = cand.prenom || ''
-    return (
-      nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      prenom.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const isERP = cand.Spéciality === 'Consultant SAP' // Vérifie la spécialité IA
+    const matchesSearch = 
+      (cand.nom || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (cand.prenom || '').toLowerCase().includes(searchTerm.toLowerCase())
+    
+    return isERP && matchesSearch
   })
   // Get current candidates for the table
   const indexOfLastCandidate = currentPage * rowsPerPage;
@@ -142,9 +142,11 @@ const Erp = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
+        <Link to="/dashboard/ajoutcandidat" className="text-blue-500 hover:text-blue-600 font-medium">
         <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-300">
-          Ajout Candidat
+         Ajout Candidat
         </button>
+        </Link>
         
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
