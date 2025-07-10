@@ -240,6 +240,9 @@ const Erp = () => {
                                    <option value="En attente">En attente</option>
                                    <option value="Accepté">Accepté</option>
                                    <option value="Refusé">Refusé</option>
+                                    <option value="validérh">validérh</option>
+                                     <option value="validé tecknique">validé tecknique</option>
+                                      <option value="validéRh">validéRh</option>
                                  </select>
                                ) : (
                                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${

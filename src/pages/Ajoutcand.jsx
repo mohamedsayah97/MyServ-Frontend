@@ -15,8 +15,8 @@ const Ajoutcand = () => {
     commentaireRh: ''
   })
 
-  const [cvFile, setCvFile] = useState(null)
-  const [compteRenduFile, setCompteRenduFile] = useState(null)
+  const [cvFile, setCvFile] = useState()
+  const [compteRenduFile, setCompteRenduFile] = useState()
   const [rh,setRh] = useState(null)
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -74,12 +74,44 @@ const Ajoutcand = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
            console.log("Candidate added:", res.data);
-          if (formData.Spéciality=== 'IA') {
-            window.location.href = '/dashboard/inteligence_artificiel';
+          switch (formData.Spéciality) {
+  case 'IA':
+    window.location.href = '/dashboard/inteligence_artificiel';
+    break;
+  case 'Consultant SAP':
+    window.location.href = '/dashboard/erp';
+    break;
+  case 'Développeur fullstack':
+    window.location.href = '/dashboard/full_stack';
+    break;
+  case 'AdminDB':
+    window.location.href = '/dashboard/admindb';
+    break;
+  case 'Analyste cybersécurité':
+    window.location.href = '/dashboard/analyste_cyber_securite';
+    break;
+  case 'Réseau et Sécurité':
+    window.location.href = '/dashboard/reseau';
+    break;
+  case 'Cloud':
+    window.location.href = '/dashboard/cloud';
+    break;
           }
-           if (formData.Spéciality=== 'Consultant SAP') {
-            window.location.href = '/dashboard/erp';
-          }
+          alert('Candidat ajouté avec succès')
+          setFormData({
+            nom: '',
+            prenom: '',
+            dateEntretien: '',
+            heureEntretien: '',
+            recruteur: '',
+            Spéciality: '',
+            feedback: 'En attente',
+            lienCV: '',
+            lien_compteRendu: '',
+            commentaireRh: ''
+          })
+          setCvFile(null)
+          setCompteRenduFile(null)
 
    } catch (error) {
      console.error('Erreur lors de l\'ajout du candidat:', error)
@@ -195,9 +227,9 @@ const Ajoutcand = () => {
             <option value="AdminDB">AdminDB</option>
             <option value="Analyste cybersécurité">Analyste cybersécurité</option>
             <option value="Consultant SAP">Consultant SAP</option>
-            <option value="Développeur fullStack">Développeur fullStack</option>
+            <option value="Développeur fullstack">Développeur fullStack</option>
             <option value="IA">IA</option>
-            <option value="Réseau et sécurité">Réseau et sécurité</option>
+            <option value="Réseau et Sécurité">Réseau et sécurité</option>
             <option value="Cloud">Cloud</option>
           </select>
         </div>
